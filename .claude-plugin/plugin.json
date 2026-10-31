@@ -1,0 +1,9 @@
+{
+  "name": "ssdlc",
+  "version": "0.1.0",
+  "description": "Secure SDLC toolkit: security review, pre-PR gate, vuln-fix workflow, and truly read-only reviewer agents",
+  "license": "MIT",
+  "author": {
+    "name": "joescoffee"
+  }
+}

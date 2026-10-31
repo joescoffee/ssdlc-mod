@@ -1,0 +1,4 @@
+fixture, not a real key
+-----BEGIN RSA PRIVATE KEY-----
+MIIEfixture
+-----END RSA PRIVATE KEY-----

@@ -1,0 +1,7 @@
+{
+  "name": "ssdlc-mod",
+  "owner": { "name": "joescoffee" },
+  "plugins": [
+    { "name": "ssdlc", "source": "./", "description": "Secure SDLC toolkit: security review, pre-PR gate, vuln-fix workflow, read-only reviewer agents" }
+  ]
+}
