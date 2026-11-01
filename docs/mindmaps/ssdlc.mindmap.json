@@ -4,10 +4,10 @@
     "title": "SSDLC mod",
     "central_image": "🛡️",
     "mode": "bloom",
-    "version": 9,
+    "version": 10,
     "created": "2026-11-01T04:54:12+00:00",
     "id_seq": 0,
-    "updated": "2026-11-01T06:12:50+00:00"
+    "updated": "2026-11-01T09:21:57+00:00"
   },
   "nodes": [
     {
@@ -428,6 +428,22 @@
       "color": null,
       "order": 5,
       "note": "讀憑證或用禁用工具＝tripwire → 主 session 下一個工具結果附警報 → 判 BLOCK；guard_log 可查"
+    },
+    {
+      "id": "h7",
+      "parent": "h",
+      "text": "白名單",
+      "color": null,
+      "order": 6,
+      "note": "v0.4.0：審查員只能讀派遣 prompt 指名的路徑（無則工作目錄）＋ plugin 目錄"
+    },
+    {
+      "id": "h8",
+      "parent": "h",
+      "text": "存活檢查",
+      "color": null,
+      "order": 7,
+      "note": "v0.5.0：guard_log 回報版本與規則自我檢查；技能派審查員前先確認，失敗即 INCOMPLETE；跨 session 歷史"
     }
   ],
   "links": [
@@ -585,6 +601,15 @@
         "h6"
       ],
       "at": "2026-11-01T06:12:50+00:00"
+    },
+    {
+      "v": 10,
+      "action": "apply(2)",
+      "ids": [
+        "h7",
+        "h8"
+      ],
+      "at": "2026-11-01T09:21:57+00:00"
     }
   ]
 }

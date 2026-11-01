@@ -15,7 +15,9 @@ claude plugin install ssdlc --marketplace joescoffee/ssdlc-mod
 📘 **新手請從 [新手操作手冊](docs/manual/README.md) 開始**：安裝、五分鐘上手、六個技能逐步教學、審查不受信任 repo 的完整流程、掃描器 CLI 與 CI、疑難排解。
 
 ## 示範 / Demo
-![ssdlc 實機示範](docs/demo.png)
+![ssdlc 實機示範（v0.5.0）](docs/demo.png)
+
+①～③ 皆為實際輸出：掃描器以 `--json` 執行後整理成表格；② 取自 Claude app 中的實機驗證（2026-11-01）。
 
 ## 實戰案例：審查 EGM 本身 / Case study
 用 `/ssdlc:safe-bootstrap` 審查上游 [google/elephant-goldfish-model](https://github.com/google/elephant-goldfish-model) @ `403d888`：Elephant（設計威脅建模）與 Goldfish（零背景程式碼審查）平行執行，再合併、交叉驗證。
