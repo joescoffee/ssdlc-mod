@@ -1,3 +1,5 @@
+<img src=".claude-plugin/icon.png" width="96" align="right">
+
 # ssdlc — Secure SDLC mod for Claude Code
 
 Security skills and truly read-only reviewer agents for Claude Code.
@@ -6,6 +8,14 @@ Security skills and truly read-only reviewer agents for Claude Code.
 ```
 /plugin install ssdlc --marketplace joescoffee/ssdlc-mod
 ```
+
+## 示範 / Demo
+![ssdlc 實機示範](docs/demo.png)
+
+## 運作方式 / How it works
+![ssdlc 心智圖](docs/ssdlc-mindmap.png)
+
+互動版：`docs/ssdlc-mindmap.html`（可縮放、拖曳、編輯）；狀態檔 `docs/mindmaps/ssdlc.mindmap.json`。
 
 ## Skills
 | Command | 用途 |
