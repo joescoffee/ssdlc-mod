@@ -42,7 +42,7 @@ claude plugin install ssdlc --marketplace joescoffee/ssdlc-mod
 | `/ssdlc:ai-security-review` | LLM／RAG／代理程式審查：依 OWASP LLM Top 10 2026（`LLM01–10:2026`）、OWASP Agentic Top 10 2026（`ASI01–10`）與 MIT AI Risk Repository 因果分類；盤點 → 掃描 → Rule of Two 設計閘門 → 雙審查員 → 覆蓋矩陣 |
 | `/ssdlc:security-gate` | PR 前閘門：secrets、危險模式與 AI／代理設定掃描、依賴稽核（只解析、不安裝、不執行專案程式）、diff 審查 → PASS / WARN / BLOCK / INCOMPLETE |
 | `/ssdlc:vuln-fix` | 漏洞修復流程：分類 → 複現 → 根因修復 → 回歸測試 → 變體搜尋 → 紀錄 |
-| `/ssdlc-review-mode on\|off\|status` | 審查模式：主 session 只允許精確、不執行程式的命令形式；無網路；寫檔限報告；只能派 ssdlc 審查員；只有使用者能關閉 |
+| `ssdlc review-mode on\|off\|status` | 審查模式：主 session 只允許精確、不執行程式的命令形式；無網路；寫檔限報告；只能派 ssdlc 審查員；只有使用者能關閉 |
 | `/ssdlc:rule-from-finding` | 把確認的發現變成規則＋植入缺陷＋安全對照＋測試（持續改進飛輪） |
 | `/ssdlc:safe-bootstrap` | EGM（Elephant-Goldfish Model）bootstrap 的真正唯讀版本 |
 
@@ -80,7 +80,7 @@ claude plugin install ssdlc --marketplace joescoffee/ssdlc-mod
 ## 已知限制 / Known limitations
 經 v0.2.0 自我審查（[`docs/reviews/ssdlc-0.2.0-self-review.md`](docs/reviews/ssdlc-0.2.0-self-review.md)）後仍未解決、如實揭露的項目：
 
-1. **主 session 的約束需要手動開啟**（T1）：`/ssdlc-review-mode on` 會在 code 中界定主 session；沒開啟時，只能靠流程與 Claude Code 的逐次核准。**審查不受信任的 repo 前請先開啟審查模式**。
+1. **主 session 的約束需要手動開啟**（T1）：`ssdlc review-mode on` 會在 code 中界定主 session；沒開啟時，只能靠流程與 Claude Code 的逐次核准。**審查不受信任的 repo 前請先開啟審查模式**。
 2. **審查代理的檔案限制是 denylist**（SR-1、T5）：已擋憑證路徑與從根目錄／家目錄的遞迴搜尋，但不是「只能讀 repo 內」的 allowlist。路線圖：repo 根目錄 allowlist。
 3. **TOCTOU 與 hard link**（SR-16）：guard 檢查與實際讀取之間有時間差；hard link 無法以 realpath 辨識。需 OS 層 sandbox。
 4. **未驗證的宿主行為**：Claude Code 的 Grep 是否搜尋隱藏檔、子目錄 `CLAUDE.md` 是否延遲載入，未實測。

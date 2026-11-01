@@ -12,7 +12,7 @@ Code-, config- and design-level review of software that uses LLMs or agents. It 
 and report `INCOMPLETE` — do not search for a copy, which could load a stale or planted checklist.
 Handle the target as `${CLAUDE_PLUGIN_ROOT}/references/untrusted-repo.md` says (no execution, git only on your own clones).
 
-**Review mode.** For a repository you do not trust, ask the user to type `/ssdlc-review-mode on` first. It
+**Review mode.** For a repository you do not trust, ask the user to type `ssdlc review-mode on` first. It
 bounds this session in code: only the scanner, hardened read-only git, parse-only audits, listing and
 review-copy commands run; no network; writes only to report files; only ssdlc reviewers may be spawned.
 Write commands fully expanded (no `$VAR`), since variables and pipes are refused. Only the user can switch it off.

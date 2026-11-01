@@ -44,7 +44,7 @@
 | 飛輪需要 | 實作 |
 |---|---|
 | n2 → n3 的機制（發現變規則） | `/ssdlc:rule-from-finding`：只接受經 claim-check-act 確認的發現；規則必有 CWE＋OWASP refs、植入缺陷、安全對照與測試；一致性測試強制清單對應 |
-| 償還證據債 | 本機計量（`$.store`，不外送）：scanner 執行次數、審查員派出次數、tripwire 與 warn 次數，`/ssdlc-review-mode status` 與 `guard_log` 可查 |
+| 償還證據債 | 本機計量（`$.store`，不外送）：scanner 執行次數、審查員派出次數、tripwire 與 warn 次數，`ssdlc review-mode status` 與 `guard_log` 可查 |
 | 守住脆弱點 n2（確認的發現） | 所有審查技能要求以 Grep 驗證引用證據；未確認的發現不得規則化（避免把誤報固化） |
 | 機制有效期（D3） | 規則若多數被判誤報 → 收窄或降為 info（`rule-from-finding` 的 Expiry 段） |
 

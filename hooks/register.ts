@@ -1,5 +1,5 @@
 import { atom, read, update } from 'claude-code'
-import type { Register } from 'claude-code'
+import type { EngineInterface, Register } from 'claude-code'
 
 import type { GuardAlert } from '../types'
 import { isPersonOrigin, reviewModeVerdict } from './review-mode'
@@ -111,6 +111,30 @@ const bump = async ($: { store: { get: (k: string) => Promise<unknown>; set: (k:
   await $.store.set(METRICS_KEY, { ...m, [field]: m[field] + 1 }).catch(() => undefined)
 }
 
+// One handler for both doors: the slash command (terminal) and a plain message
+// (`ssdlc review-mode on`), which also works where a client cannot run plugin-
+// registered slash commands (the Claude app driving an SDK-hosted session).
+export async function reviewModeCommand($: EngineInterface, arg: string, origin: { kind: string } | undefined): Promise<string> {
+  if (arg === 'on') {
+    await update($, reviewModeAtom, () => true)
+    $.ui.status(`${$.plugin.name}: review mode ON`)
+    return 'Review mode ON: only scanner, hardened read-only git, parse-only audits, listing and review-copy commands run; no network; writes limited to report files; only ssdlc reviewers may be spawned. Turn off by typing: ssdlc review-mode off'
+  }
+  if (arg === 'off') {
+    if (!isPersonOrigin(origin)) return 'Review mode can only be switched off by the person, typing it.'
+    await update($, reviewModeAtom, () => false)
+    $.ui.status(undefined)
+    return 'Review mode OFF.'
+  }
+  const alerts = await read($, alertsAtom)
+  const m = (await $.store.get(METRICS_KEY).catch(() => undefined)) as Metrics | undefined
+  return `Review mode is ${(await read($, reviewModeAtom)) ? 'ON' : 'OFF'}; guard events this session: ${alerts.length} (${alerts.filter(a => a.level === 'tripwire').length} tripwire).` +
+    (m ? ` Since ${m.since.slice(0, 10)}: ${m.gateRuns} scanner runs, ${m.reviewerSpawns} reviewer runs, ${m.tripwires} tripwires, ${m.warns} warnings (local only).` : '')
+}
+
+/** `ssdlc review-mode on|off|status`, with or without a leading slash or hyphens. */
+export const REVIEW_MODE_PROMPT = /^\/?ssdlc[-\s:]review[-\s]mode(?:\s+(on|off|status))?$/i
+
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
     await $.command.register({
@@ -127,23 +151,15 @@ export const register: Register = on => {
     return next(e)
   })
 
-  on('command.run', { command: 'ssdlc-review-mode' }, async ($, e) => {
-    const arg = e.args.trim().toLowerCase()
-    if (arg === 'on') {
-      await update($, reviewModeAtom, () => true)
-      $.ui.status(`${$.plugin.name}: review mode ON`)
-      return { text: 'Review mode ON: only scanner, hardened read-only git, parse-only audits, listing and review-copy commands run; no network; writes limited to report files; only ssdlc reviewers may be spawned. Turn off with /ssdlc-review-mode off (typed by you).' }
-    }
-    if (arg === 'off') {
-      if (!isPersonOrigin(e.origin)) return { text: 'Review mode can only be switched off by the person, typing the command.' }
-      await update($, reviewModeAtom, () => false)
-      $.ui.status(undefined)
-      return { text: 'Review mode OFF.' }
-    }
-    const alerts = await read($, alertsAtom)
-    const m = (await $.store.get(METRICS_KEY).catch(() => undefined)) as Metrics | undefined
-    return { text: `Review mode is ${(await read($, reviewModeAtom)) ? 'ON' : 'OFF'}; guard events this session: ${alerts.length} (${alerts.filter(a => a.level === 'tripwire').length} tripwire).` +
-      (m ? ` Since ${m.since.slice(0, 10)}: ${m.gateRuns} scanner runs, ${m.reviewerSpawns} reviewer runs, ${m.tripwires} tripwires, ${m.warns} warnings (local only).` : '') }
+  on('command.run', { command: 'ssdlc-review-mode' }, async ($, e) => ({
+    text: await reviewModeCommand($, e.args.trim().toLowerCase(), e.origin),
+  }))
+
+  on('prompt.submit', async ($, e, next) => {
+    const m = REVIEW_MODE_PROMPT.exec(e.text.trim())
+    if (m === null || e.isMeta) return next(e)
+    // Answered here and shown to the person; the model never receives it.
+    return { drop: await reviewModeCommand($, (m[1] ?? 'status').toLowerCase(), e.origin) }
   })
 
   on('tool.call', { tool: 'mcp__ssdlc__guard_log' }, async $ => {
@@ -197,7 +213,7 @@ export const register: Register = on => {
       await bump($, level === 'tripwire' ? 'tripwires' : 'warns')
       const trips = (await read($, alertsAtom)).filter(a => a.level === 'tripwire').length
       $.ui.toast(`${$.plugin.name}: blocked reviewer ${e.tool} — ${why}`)
-      if (trips > 0) $.ui.status(`${$.plugin.name}: ⚠ ${trips} tripwire(s) — run /ssdlc-review-mode status`)
+      if (trips > 0) $.ui.status(`${$.plugin.name}: ⚠ ${trips} tripwire(s) — run ssdlc review-mode status`)
       return { deny: `${$.plugin.name}: ${why}` }
     }
     if (!READ_ONLY.has(e.tool)) return refuse('tool', `reviewer agents are read-only (${e.tool} refused).`)
