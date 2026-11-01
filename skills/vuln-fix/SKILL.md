@@ -1,6 +1,7 @@
 ---
 name: vuln-fix
 description: Vulnerability remediation workflow — triage, reproduce, fix the root cause, add a regression test, and hunt for variants. Use when given a CVE, scanner finding, pentest result, bug-bounty report, or a security-review finding to fix.
+disable-model-invocation: true
 ---
 
 # SSDLC Vulnerability Fix
@@ -19,8 +20,9 @@ description: Vulnerability remediation workflow — triage, reproduce, fix the r
 - Keep the change minimal and behaviour-preserving for legitimate input.
 
 ## 4. Verify
-- The reproduction test now passes; the full test suite passes.
-- Re-run `python3 -I ${CLAUDE_PLUGIN_ROOT}/scripts/gate_scan.py` on the touched files.
+- The reproduction test now passes; the full test suite passes — run them under the same rule as step 2: inside a disposable sandbox for any repository you do not trust, or after asking the user (`${CLAUDE_PLUGIN_ROOT}/references/untrusted-repo.md` §4).
+- Re-run `python3 -I ${CLAUDE_PLUGIN_ROOT}/scripts/gate_scan.py <touched files>` (markers are ignored by default).
+- Never make a check pass by weakening it: do not add `ssdlc: allow` markers, delete or skip tests, or loosen a rule to get a green result (OWASP ASI10). If a finding is a false positive, say so in the fix note.
 
 ## 5. Variant hunt
 - Grep the codebase for the same pattern (same API, same idiom, copy-pasted code). Fix or list each variant.

@@ -69,18 +69,30 @@ class NoFalsePositives(unittest.TestCase):
     def test_parameterized_sql(self):
         self.assertEqual(gate_scan.scan_text('cur.execute("SELECT 1 WHERE a = %s", (a,))', "t"), [])
 
-    def test_allow_marker_needs_reason_and_is_reported(self):
-        gate_scan.SUPPRESSED.clear()
-        self.assertEqual(gate_scan.scan_text("os.system(cmd)  # ssdlc: allow reviewed by sec team", "t"), [])
-        self.assertEqual(gate_scan.SUPPRESSED[-1]["reason"], "reviewed by sec team")
-        self.assertTrue(gate_scan.scan_text("os.system(cmd)  # ssdlc: allow", "t"), "bare marker must not suppress")
+    def test_markers_ignored_by_default(self):
+        gate_scan.HONOR_MARKERS = False
+        self.assertTrue(gate_scan.scan_text("os.system(cmd)  # ssdlc: allow trust me", "t"))
 
-    def test_strict_ignores_markers(self):
-        gate_scan.STRICT = True
+    def test_honored_marker_needs_reason_and_is_reported(self):
+        gate_scan.HONOR_MARKERS = True
         try:
-            self.assertTrue(gate_scan.scan_text("os.system(cmd)  # ssdlc: allow trust me", "t"))
+            gate_scan.SUPPRESSED.clear()
+            self.assertEqual(gate_scan.scan_text("os.system(cmd)  # ssdlc: allow reviewed by sec team", "t"), [])
+            self.assertEqual(gate_scan.SUPPRESSED[-1]["reason"], "reviewed by sec team")
+            self.assertTrue(gate_scan.scan_text("os.system(cmd)  # ssdlc: allow", "t"), "bare marker must not suppress")
         finally:
-            gate_scan.STRICT = False
+            gate_scan.HONOR_MARKERS = False
+
+    def test_marker_never_hides_secrets_or_hidden_chars(self):
+        gate_scan.HONOR_MARKERS = True
+        try:
+            key = "AKIA" + "ABCDEFGHIJKLMNOP"
+            rules = {f.rule for f in gate_scan.scan_text(f'k = "{key}"  # ssdlc: allow test data', "t")}
+            self.assertIn("secret.aws-access-key", rules)
+            hidden = "x" + chr(0xE0041) + "  # ssdlc: allow fine"
+            self.assertIn("ai.unicode-tag-smuggling", {f.rule for f in gate_scan.scan_text(hidden, "t")})
+        finally:
+            gate_scan.HONOR_MARKERS = False
 
 
 class SecretPatterns(unittest.TestCase):
@@ -190,7 +202,7 @@ class AiAgentRules(unittest.TestCase):
             os.makedirs(os.path.join(d, ".git"))
             with open(os.path.join(d, ".git", "config"), "w") as fh:
                 fh.write("[core]\n\tfsmonitor = ./.payload.sh\n\tpassword = \"not-scanned-here\"\n")
-            self.assertEqual([f.rule for f in gate_scan.scan_paths([d])], ["ai.open-time-exec"])
+            self.assertEqual([f.rule for f in gate_scan.scan_paths([d])], ["repo.git-config-exec"])
 
     def test_skipped_files_are_reported(self):
         gate_scan.SKIPPED.clear()
@@ -201,6 +213,111 @@ class AiAgentRules(unittest.TestCase):
             gate_scan.scan_paths([d])
         reasons = sorted(x["reason"] for x in gate_scan.SKIPPED)
         self.assertEqual(reasons, ["binary (NUL byte)", "directory skipped by default"])
+
+
+class ReviewFixes(unittest.TestCase):
+    """Regression tests for the v0.2.0 independent review (SR-n goldfish, T-n elephant)."""
+
+    def cli(self, *args, **kw):
+        return subprocess.run([sys.executable, "-I", os.path.join(ROOT, "scripts", "gate_scan.py"), *args],
+                              capture_output=True, text=True, timeout=30, **kw)
+
+    def test_sr7_secret_redacted_in_non_secret_finding(self):
+        key = "sk-ant-" + "api03-" + "Z" * 30
+        line = f'requests.get(u, headers={{"Authorization": "Bearer {key}"}}, verify=False)'
+        for f in gate_scan.scan_text(line, "t"):
+            self.assertNotIn(key, f.excerpt, f.rule)
+            self.assertNotIn("Z" * 10, f.excerpt, f.rule)
+
+    def test_sr7_punctuated_password_redacted(self):
+        f = gate_scan.scan_text('password = "P@ssw0rd!2024"', "t")[0]
+        self.assertNotIn("P@ssw0rd!2024", f.excerpt)
+        self.assertIn("P@ss…", f.excerpt)
+
+    def test_t3_control_chars_escaped(self):
+        f = gate_scan.scan_text("os.system(x)  # \x1b]52;c;ZXZpbA==\x07", "t")[0]
+        self.assertNotIn("\x1b", f.excerpt)
+        self.assertIn("\\x1b", f.excerpt)
+
+    def test_sr6_redos_bounded(self):
+        import time
+        hostile = ['cur.execute("' + "select " * 40000, "token=" * 400000, "subprocess.run(" + "a," * 300000]
+        start = time.monotonic()
+        for line in hostile:
+            gate_scan.scan_text(line, "t")
+        self.assertLess(time.monotonic() - start, 5.0)
+        self.assertTrue(any("partially scanned" in x["reason"] for x in gate_scan.SKIPPED))
+
+    def test_sr10_missing_path_is_incomplete(self):
+        r = self.cli("/nonexistent/ssdlc-path")
+        self.assertEqual(r.returncode, 3, r.stdout)
+        self.assertIn("INCOMPLETE", r.stdout)
+
+    @unittest.skipUnless(hasattr(os, "mkfifo"), "needs mkfifo")
+    def test_sr10_fifo_never_opened(self):
+        with tempfile.TemporaryDirectory() as d:
+            os.mkfifo(os.path.join(d, "pipe"))
+            r = self.cli("--json", d)
+            out = json.loads(r.stdout)
+            self.assertEqual(r.returncode, 3)
+            self.assertEqual(out["skipped"][0]["reason"], "not a regular file")
+
+    def test_t14_unknown_flag_and_double_dash(self):
+        self.assertEqual(self.cli("--stict", os.path.join(FIX, "safe_app.py")).returncode, 2)
+        with tempfile.TemporaryDirectory() as d:
+            weird = os.path.join(d, "--json")
+            with open(weird, "w") as fh:
+                fh.write("os.system(x)\n")
+            r = self.cli("--", weird)
+            self.assertEqual(r.returncode, 1)
+
+    def test_t2_files_from_nul_separated(self):
+        with tempfile.TemporaryDirectory() as d:
+            evil = os.path.join(d, "x$(touch pwned).py")
+            with open(evil, "w") as fh:
+                fh.write("os.system(x)\n")
+            lst = os.path.join(d, "list")
+            with open(lst, "wb") as fh:
+                fh.write(evil.encode() + b"\0")
+            r = self.cli("--json", "--files-from", lst)
+            self.assertEqual(json.loads(r.stdout)["findings"][0]["rule"], "code.shell-injection")
+            self.assertFalse(os.path.exists(os.path.join(d, "pwned")))
+
+    def test_sr9_git_config_keys_case_insensitive(self):
+        with tempfile.TemporaryDirectory() as d:
+            os.makedirs(os.path.join(d, ".git"))
+            with open(os.path.join(d, ".git", "config"), "w") as fh:
+                fh.write('[core]\n\tfsMonitor = ./x.sh\n\tsshCommand = ./y\n[filter "x"]\n\tclean = sh -c id\n'
+                         '[diff]\n\texternal = ./z\n[alias]\n\tst = !sh -c id\n[user]\n\tname = A\n')
+            found = gate_scan.scan_paths([d])
+            self.assertEqual(len(found), 5, [f.excerpt for f in found])
+            self.assertEqual({f.rule for f in found}, {"repo.git-config-exec"})
+
+    def test_sr19_mcp_jsonc_windows_and_major_only(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = os.path.join(d, "mcp.json")
+            with open(p, "w") as fh:
+                fh.write('{\n  // VS Code style\n  "servers": {\n'
+                         '    "a": { "command": "npx.cmd", "args": ["-y", "pkg-a"] },\n'
+                         '    "b": { "command": "cmd", "args": ["/c", "npx", "-y", "pkg-b@1"] },\n'
+                         '    "c": { "command": "npx", "args": ["-y", "pkg-c@1.2.3"], "headers": {"X-API-Key": "abcdefgh1234"} },\n'
+                         '  },\n}\n')
+            found = gate_scan.scan_paths([d])
+            self.assertEqual(sorted(f.rule for f in found), ["ai.mcp-inline-secret", "ai.mcp-unpinned", "ai.mcp-unpinned"])
+
+    def test_sr15_git_symlink_reported(self):
+        with tempfile.TemporaryDirectory() as d:
+            outside, repo = os.path.join(d, "o"), os.path.join(d, "r")
+            os.makedirs(os.path.join(outside, "g")); os.makedirs(repo)
+            with open(os.path.join(outside, "g", "config"), "w") as fh:
+                fh.write("[core]\n\tfsmonitor = x\n")
+            os.symlink(os.path.join(outside, "g"), os.path.join(repo, ".git"))
+            self.assertIn("repo.symlink-escape", [f.rule for f in gate_scan.scan_paths([repo])])
+
+    def test_sr21_state_reset_between_scans(self):
+        gate_scan.scan_paths(["/nonexistent/a"])
+        gate_scan.scan_paths([os.path.join(FIX, "safe_app.py")])
+        self.assertEqual(gate_scan.SKIPPED, [])
 
 
 class ChecklistConsistency(unittest.TestCase):

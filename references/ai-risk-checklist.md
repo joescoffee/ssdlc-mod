@@ -166,7 +166,7 @@ Model output passed to downstream components without validation, encoding or san
 
 ### ASI04 — Agentic Supply Chain Vulnerabilities — 代理供應鏈弱點
 - **Look for**: MCP servers launched by exact version, hash or image digest from a curated registry; prompts, orchestration scripts and memory schemas under version control and review; AIBOM; dependency allowlist + pinning + typosquat checks, unsigned rejected; sensitive agents in restricted containers; a **supply-chain kill switch** that disables a tool/prompt/connection everywhere; project-level config that executes on open (`.vscode` tasks `runOn: folderOpen`, `.git/config` `fsmonitor`/`hooksPath`, project `.claude/settings.json` hooks).
-- **Scanner**: `ai.mcp-unpinned`, `ai.open-time-exec`, `repo.symlink-escape`, `ai.trust-remote-code`.
+- **Scanner**: `ai.mcp-unpinned`, `ai.open-time-exec`, `repo.git-config-exec`, `repo.symlink-escape`, `ai.trust-remote-code`.
 
 ### ASI05 — Unexpected Code Execution (RCE) — 非預期程式碼執行
 - **Look for**: no tool passes model output to shell/`eval`/`exec`/template engines (argv arrays, not shell strings); code execution in a sandbox (non-root, no or allowlisted network, read-only FS outside the workdir, resource limits); generation separated from execution with a static-scan gate; auto-execution allowlist in version control; agents cannot reach production directly; memory/checkpointers do not use `eval` or pickle; every generation and execution logged.

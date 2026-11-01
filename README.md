@@ -4,7 +4,7 @@
 
 Security skills and truly read-only reviewer agents for Claude Code.
 
-在 Claude Code 中落實安全軟體開發生命週期（SSDLC）：安全審查、PR 前閘門、漏洞修復流程，以及 **Elephant-Goldfish Model（EGM）審查的真正唯讀版本**。審查員只有 Read/Grep/Glob，並由 hook 強制執行；不執行被審 repo 的任何程式碼，也不開啟 repo 外的連結。
+在 Claude Code 中落實安全軟體開發生命週期（SSDLC）：安全審查、PR 前閘門、漏洞修復流程，以及 **Elephant-Goldfish Model（EGM）審查的真正唯讀版本**。審查員只有 Read/Grep/Glob（工具限制由 frontmatter 與 hook 強制），hook 另擋憑證路徑與從根目錄、家目錄的遞迴搜尋；「只讀 repo 內、不開 repo 外連結」則是提示層約束。所有流程都不執行被審 repo 的程式碼。
 
 ## 安裝 / Install
 ```
@@ -63,14 +63,23 @@ Security skills and truly read-only reviewer agents for Claude Code.
 | MCP 設定（JSON 解析） | 未鎖版本的 `npx`／`uvx`／`@latest`、`env`／`headers` 內嵌密鑰、非本機的明文 HTTP |
 | Repo | 指向 repo 外的 symlink |
 
-`# ssdlc: allow <理由>` 可抑制單行（必須附理由，且會列在報告的 suppressed）；審查不受信任的 repo 時一律加 `--strict` 忽略標記。超過大小、二進位或預設略過的目錄會列為 skipped。
+`# ssdlc: allow <理由>` 標記**預設不採用**（被審程式碼也能寫標記）；只有加 `--honor-markers` 才生效，且永遠不能隱藏 secret 與隱形字元發現。無法讀取、非一般檔案、過大的檔案會列為 skipped，並以結束碼 3（INCOMPLETE）表示掃描不完整。
 
 ## References
 `references/ai-risk-checklist.md`（OWASP 2026 逐項審查、測試與規則對照）、`references/mit-ai-risk-triage.md`（MIT 24 子域 SSDLC 分流與因果情境格）。這兩份改編自 CC 授權文件，採 **CC BY-SA 4.0**；其餘程式碼為 MIT。
 
+## 已知限制 / Known limitations
+經 v0.2.0 自我審查（[`docs/reviews/ssdlc-0.2.0-self-review.md`](docs/reviews/ssdlc-0.2.0-self-review.md)）後仍未解決、如實揭露的項目：
+
+1. **主 session 不受 guard 約束**（T1）：它握有 Bash/Write 又讀取不受信任內容，依本 mod 自己的 Rule of Two 屬 High。緩解靠流程（不執行 repo 程式、報告是資料）與 Claude Code 的逐次核准；**請勿在 bypass／acceptEdits 模式下審查不受信任的 repo**。路線圖：主 session「審查模式」hook。
+2. **審查代理的檔案限制是 denylist**（SR-1、T5）：已擋憑證路徑與從根目錄／家目錄的遞迴搜尋，但不是「只能讀 repo 內」的 allowlist。路線圖：repo 根目錄 allowlist。
+3. **TOCTOU 與 hard link**（SR-16）：guard 檢查與實際讀取之間有時間差；hard link 無法以 realpath 辨識。需 OS 層 sandbox。
+4. **未驗證的宿主行為**：Claude Code 的 Grep 是否搜尋隱藏檔、子目錄 `CLAUDE.md` 是否延遲載入，未實測。
+5. **掃描器是程式碼衛生檢查**，不是執行期的注入或 DLP 過濾器（OWASP 2026 明言 regex 擋不住編碼內容）。
+
 ## Tests
 ```
-python3 -I -m unittest discover -s tests -v   # 40 tests: planted defects for every rule + safe counterparts
-claude plugin test .                           # 9 guard hook tests
+python3 -I -m unittest discover -s tests -v   # 53 tests: planted defects for every rule, safe counterparts, review regressions
+claude plugin test .                           # 13 guard hook tests
 ```
 `tests/fixtures/` 內是**刻意植入漏洞**的範例檔，請勿匯入或執行。

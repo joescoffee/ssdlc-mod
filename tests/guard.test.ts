@@ -1,11 +1,18 @@
 import { expect, test } from 'claude-code/testing'
 
 // Stand-ins for the engine beneath the plugin.
-const engine = (on: any, links: Record<string, string> = {}) => {
+const engine = (on: any, links: Record<string, string> = {}, cwd = '/repo') => {
   let n = 0
+  const spawned: { id: string; type: string }[] = []
+  on('agent.list', () => ({ value: spawned.map(a => ({ ...a, description: '', status: 'running' })) }))
   on('ui.toast', () => ({ value: undefined }))
-  on('fs.stat', (_: any, e: any) => ({ value: { kind: 'file', size: 1, mtimeMs: 0, isLink: e.path in links, realPath: links[e.path] ?? e.path } }))
-  on('agent.spawn', () => ({ agentId: `agent-${++n}`, model: 'm' }))
+  on('fs.stat', (_: any, e: any) => ({ value: { kind: 'file', size: 1, mtimeMs: 0, isLink: e.path in links,
+    realPath: e.path === '.' ? cwd : (links[e.path] ?? e.path) } }))
+  on('agent.spawn', (_: any, e: any) => {
+    const id = `agent-${++n}`
+    spawned.push({ id, type: e.subagentType })
+    return { agentId: id, model: 'm' }
+  })
   on('tool.call', () => ({ result: {} }))
 }
 
@@ -93,4 +100,48 @@ test('a symlink in the repo that lands in a credential store is refused', async 
   expect(r.deny).toMatch(/resolves to \/root\/\.ssh\/id_ed25519/)
   const ok = await $.tool.call({ tool: 'Read', file_path: '/repo/src/app.py', agentId } as any)
   expect(ok.deny).toBe(undefined)
+})
+
+test('review fixes: case, spellings, extra stores, broad searches, cwd', async ($, on) => {
+  engine(on, {}, '/root')
+  const { agentId } = await $.agent.spawn({ prompt: 'review', subagentType: 'ssdlc:security-reviewer' })
+  const denied = async (tool: string, args: object) =>
+    (await $.tool.call({ tool, ...args, agentId } as any)).deny
+  for (const file_path of ['/Users/u/.SSH/id_rsa', '/repo/.ENV', '/srv/server.KEY', '//proc/self/environ', '/etc//shadow',
+    '/var/run/secrets/kubernetes.io/serviceaccount/token', '/repo/.envrc', '/repo/.env.production.local',
+    '/home/u/.claude.json', '/home/u/.claude/projects/x.jsonl', '/home/u/.zsh_history', '/k/id_ed25519_sk', '/a/b.jks']) {
+    expect(await denied('Read', { file_path })).toMatch(/credential stores/)
+  }
+  for (const path of ['/', '/root', '/home/u', '/home/u/', '/etc', '/root/.config', 'C:\\']) {
+    expect(await denied('Grep', { pattern: 'token', path })).toMatch(/recursively|credential/)
+  }
+  expect(await denied('Glob', { pattern: '**/.s[s]h/*' })).toMatch(/credential stores/)
+  expect(await denied('Glob', { pattern: '**/.{ssh,aws}/*', path: '/repo' })).toMatch(/credential stores/)
+})
+
+test('review fixes: repo searches still work', async ($, on) => {
+  engine(on, {}, '/work/repo')
+  const { agentId } = await $.agent.spawn({ prompt: 'review', subagentType: 'ssdlc:security-reviewer' })
+  for (const [tool, args] of [['Grep', { pattern: 'eval', path: '/work/repo/src' }], ['Grep', { pattern: 'eval' }],
+    ['Glob', { pattern: 'src/**/*.py', path: '/work/repo' }], ['Read', { file_path: '/work/repo/config/settings.py' }]] as const) {
+    expect((await $.tool.call({ tool, ...args, agentId } as any)).deny).toBe(undefined)
+  }
+})
+
+test('a reviewer is recognised after a module reload, via the agent list', async ($, on) => {
+  engine(on)
+  const { agentId } = await $.agent.spawn({ prompt: 'review', subagentType: 'ssdlc:design-reviewer' })
+  // A tool call from an agent id the module never saw spawn: looked up by type.
+  const r = await $.tool.call({ tool: 'Bash', command: 'id', agentId } as any)
+  expect(r.deny).toMatch(/read-only/)
+})
+
+test('a search without a path is judged by the working directory', async ($, on) => {
+  on('ui.toast', () => ({ value: undefined }))
+  on('agent.list', () => ({ value: [{ id: 'r1', type: 'ssdlc:security-reviewer', description: '', status: 'running' }] }))
+  // The host resolves "." to the session's working directory; here that is /root.
+  on('fs.stat', () => ({ value: { kind: 'dir', size: 0, mtimeMs: 0, isLink: false, realPath: '/root' } }))
+  on('tool.call', () => ({ result: {} }))
+  const r = await $.tool.call({ tool: 'Grep', pattern: 'token', agentId: 'r1' } as any)
+  expect(r.deny).toMatch(/recursively/)
 })
