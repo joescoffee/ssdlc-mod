@@ -127,7 +127,7 @@ ASI 已記錄：6/10。
 - MITRE ATT&CK：—
 - 威脅行為者：惡意 repo／PR 作者
 - MAESTRO：L3；代理因子：AU, ND
-- 現行控制：同 SSDLC-01；審查模式 /ssdlc:review-mode（hooks/review-mode.ts）：主 session 只允許精確命令形式、拒絕網路、寫檔限報告路徑、只能派 ssdlc 審查員；關閉須由人輸入（需使用者開啟）
+- 現行控制：同 SSDLC-01；審查模式 /ssdlc-review-mode（hooks/review-mode.ts）：主 session 只允許精確命令形式、拒絕網路、寫檔限報告路徑、只能派 ssdlc 審查員；關閉須由人輸入（需使用者開啟）
 - 建議控制：審查不受信任的 repo 時預設開啟審查模式；長期：repo 根目錄 allowlist 與 OS 層 sandbox
 - 處理狀態：進行中
 - 處置狀態 treatment_status：planned　有效風險：1.5（Medium）

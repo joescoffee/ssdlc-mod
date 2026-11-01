@@ -20,7 +20,7 @@ The stock EGM bootstrap describes its reviewers as read-only but, in Claude Code
 - Run git only on a repository you cloned yourself, with that file's `$GIT` flags (§1–§2).
 - Run the reviewers from a session whose working directory is the review copy, not your home directory (the guard refuses recursive searches from `~`).
 
-**Review mode.** For a repository you do not trust, ask the user to type `/ssdlc:review-mode on` first. It
+**Review mode.** For a repository you do not trust, ask the user to type `/ssdlc-review-mode on` first. It
 bounds this session in code: only the scanner, hardened read-only git, parse-only audits, listing and
 review-copy commands run; no network; writes only to report files; only ssdlc reviewers may be spawned.
 Write commands fully expanded (no `$VAR`), since variables and pipes are refused. Only the user can switch it off.

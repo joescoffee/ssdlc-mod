@@ -114,7 +114,7 @@ const bump = async ($: { store: { get: (k: string) => Promise<unknown>; set: (k:
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
     await $.command.register({
-      name: 'review-mode',
+      name: 'ssdlc-review-mode',
       description: 'ssdlc: restrict this session to non-executing review commands (on | off | status)',
     })
     await $.tool.register({
@@ -127,12 +127,12 @@ export const register: Register = on => {
     return next(e)
   })
 
-  on('command.run', { command: 'review-mode' }, async ($, e) => {
+  on('command.run', { command: 'ssdlc-review-mode' }, async ($, e) => {
     const arg = e.args.trim().toLowerCase()
     if (arg === 'on') {
       await update($, reviewModeAtom, () => true)
       $.ui.status(`${$.plugin.name}: review mode ON`)
-      return { text: 'Review mode ON: only scanner, hardened read-only git, parse-only audits, listing and review-copy commands run; no network; writes limited to report files; only ssdlc reviewers may be spawned. Turn off with /ssdlc:review-mode off (typed by you).' }
+      return { text: 'Review mode ON: only scanner, hardened read-only git, parse-only audits, listing and review-copy commands run; no network; writes limited to report files; only ssdlc reviewers may be spawned. Turn off with /ssdlc-review-mode off (typed by you).' }
     }
     if (arg === 'off') {
       if (!isPersonOrigin(e.origin)) return { text: 'Review mode can only be switched off by the person, typing the command.' }
@@ -149,8 +149,9 @@ export const register: Register = on => {
   on('tool.call', { tool: 'mcp__ssdlc__guard_log' }, async $ => {
     const alerts = await read($, alertsAtom)
     await update($, alertsAtom, list => list.map(a => ({ ...a, delivered: true })))
-    return { result: { reviewMode: await read($, reviewModeAtom), alerts,
-      metrics: (await $.store.get(METRICS_KEY).catch(() => undefined)) ?? null } }
+    // A registered tool answers with text (or content blocks), never a bare object.
+    return { result: JSON.stringify({ reviewMode: await read($, reviewModeAtom), alerts,
+      metrics: (await $.store.get(METRICS_KEY).catch(() => undefined)) ?? null }, null, 2) }
   })
 
   on('agent.spawn', async ($, e, next) => {
@@ -196,7 +197,7 @@ export const register: Register = on => {
       await bump($, level === 'tripwire' ? 'tripwires' : 'warns')
       const trips = (await read($, alertsAtom)).filter(a => a.level === 'tripwire').length
       $.ui.toast(`${$.plugin.name}: blocked reviewer ${e.tool} — ${why}`)
-      if (trips > 0) $.ui.status(`${$.plugin.name}: ⚠ ${trips} tripwire(s) — run /ssdlc:review-mode status`)
+      if (trips > 0) $.ui.status(`${$.plugin.name}: ⚠ ${trips} tripwire(s) — run /ssdlc-review-mode status`)
       return { deny: `${$.plugin.name}: ${why}` }
     }
     if (!READ_ONLY.has(e.tool)) return refuse('tool', `reviewer agents are read-only (${e.tool} refused).`)

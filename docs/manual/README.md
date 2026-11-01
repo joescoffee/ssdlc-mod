@@ -1,6 +1,6 @@
 # ssdlc 新手操作手冊
 
-> 適用版本：**ssdlc v0.3.0**（2026-11-01）。本手冊的每一條指令都在該版本實際執行過；截圖為實機輸出。
+> 適用版本：**ssdlc v0.3.1**（2026-11-01）。本手冊的每一條指令都在該版本實際執行過；截圖為實機輸出。
 > 讀完前三章（約 15 分鐘）即可開始使用；其餘章節在需要時查閱。
 
 ## 目錄
@@ -30,7 +30,7 @@ ssdlc 是一個 **Claude Code 外掛（plugin）**，把安全軟體開發生命
 | 開 PR 前快速檢查有沒有洩漏金鑰、危險程式、AI 代理設定錯誤 | `/ssdlc:security-gate` |
 | 對一段程式碼做完整安全審查 | `/ssdlc:security-review` |
 | 審查會呼叫 LLM、使用代理、MCP、RAG 的程式 | `/ssdlc:ai-security-review` |
-| 審查別人給的、不能信任的 repo（例如外部 PR、供應商程式碼） | `/ssdlc:review-mode on` ＋ `/ssdlc:safe-bootstrap` |
+| 審查別人給的、不能信任的 repo（例如外部 PR、供應商程式碼） | `/ssdlc-review-mode on` ＋ `/ssdlc:safe-bootstrap` |
 | 修一個已知漏洞 | `/ssdlc:vuln-fix` |
 | 把一次確認過的發現，變成以後自動檢查的規則 | `/ssdlc:rule-from-finding` |
 
@@ -49,6 +49,7 @@ ssdlc 是一個 **Claude Code 外掛（plugin）**，把安全軟體開發生命
 | 名詞 | 意思 |
 |---|---|
 | **Skill（技能）** | 以 `/ssdlc:名稱` 呼叫的一套步驟說明，Claude 照著執行。 |
+| **`/ssdlc-review-mode`** | 唯一**不是**技能的指令：由守門程式直接處理，所以名稱用連字號、沒有 `ssdlc:` 前綴。 |
 | **Agent（子代理）** | Claude 另外派出的助手。ssdlc 的兩個審查員都是唯讀子代理。 |
 | **Hook（守門程式）** | 外掛內建的程式，在每次工具呼叫前檢查，違規就拒絕。安裝後自動生效。 |
 | **Goldfish／Elephant** | 兩種審查員視角。Goldfish（金魚）不給背景、只看程式碼本身；Elephant（大象）拿到完整背景、做設計層威脅建模。兩份結果交叉比對。 |
@@ -118,7 +119,7 @@ claude plugin details ssdlc
 在 Claude Code 對話中再確認守門程式已載入：
 
 ```
-/ssdlc:review-mode status
+/ssdlc-review-mode status
 ```
 
 回覆 `Review mode is OFF; guard events this session: 0 …` 即表示 hook 正常運作。
@@ -236,7 +237,7 @@ rsync -a --exclude .git --exclude CLAUDE.md --exclude AGENTS.md --exclude .claud
 cd review-copy && claude
 ```
 ```
-/ssdlc:review-mode on
+/ssdlc-review-mode on
 ```
 
 狀態列會顯示 `ssdlc: review mode ON`。從現在起，主對話只能跑掃描器、加固過的唯讀 git、只解析的稽核工具、列目錄與 rsync；不能上網；只能寫報告檔；只能派 ssdlc 審查員。
@@ -254,13 +255,13 @@ cd review-copy && claude
 審查員回來後，Claude 會查 `guard_log`。如果任何審查員嘗試讀你的憑證檔或用不該有的工具，報告會出現 **BLOCK：`ai.injection-attempt-observed`**——代表這個 repo 在嘗試提示注入，請把它視為惡意。你也可以自己查：
 
 ```
-/ssdlc:review-mode status
+/ssdlc-review-mode status
 ```
 
 **步驟 6：結束後關閉審查模式**
 
 ```
-/ssdlc:review-mode off
+/ssdlc-review-mode off
 ```
 
 > 只有你親自輸入才能關閉；Claude 或其他外掛呼叫都會被拒絕。
@@ -371,7 +372,7 @@ HIGH     ai.mcp-inline-secret   .mcp.json:0  server 'issues': ISSUES_API_TOKEN=t
 
 ### 10.3 本機計量
 
-`/ssdlc:review-mode status` 會顯示自首次使用以來的掃描次數、審查員派出次數、tripwire 與 warn 次數。這些數字只存在你的電腦（Claude Code 的外掛儲存區），不會傳到任何地方，用途是讓你知道工具被使用的程度與警報的頻率。
+`/ssdlc-review-mode status` 會顯示自首次使用以來的掃描次數、審查員派出次數、tripwire 與 warn 次數。這些數字只存在你的電腦（Claude Code 的外掛儲存區），不會傳到任何地方，用途是讓你知道工具被使用的程度與警報的頻率。
 
 ---
 
@@ -382,8 +383,8 @@ HIGH     ai.mcp-inline-secret   .mcp.json:0  server 'issues': ISSUES_API_TOKEN=t
 | `Plugin "ssdlc" not found in marketplace` | 市集名稱是 `ssdlc-mod`：用 `ssdlc@ssdlc-mod`，或用 `--marketplace joescoffee/ssdlc-mod` 一行安裝 |
 | `Marketplace file not found` 或 404 | repo 目前是私有的：確認你的 GitHub 帳號有存取權 |
 | 輸入 `/ssdlc:...` 沒反應 | 執行 `/reload-plugins`；用 `claude plugin list` 確認狀態為 enabled |
-| `/ssdlc:review-mode status` 顯示「未知指令」 | hook 模組沒載入：更新到 v0.3.0 以上並重新啟動 Claude Code |
-| 審查模式下指令被拒 | 改成[第 10.2 節](#102-審查模式允許的指令形式)的形式；變數要展開成實際值。真的需要其他指令時，由你輸入 `/ssdlc:review-mode off` |
+| `Unknown command: /ssdlc:review-mode` | 指令名稱是 `/ssdlc-review-mode`（連字號，沒有冒號）。若 `/ssdlc-review-mode` 也是未知指令，代表 hook 模組沒載入：更新到 v0.3.1 以上並重新啟動 Claude Code |
+| 審查模式下指令被拒 | 改成[第 10.2 節](#102-審查模式允許的指令形式)的形式；變數要展開成實際值。真的需要其他指令時，由你輸入 `/ssdlc-review-mode off` |
 | 掃描結束碼 3 | 報告的 `SKIPPED` 列出沒掃到的檔案與原因；修正路徑或權限後重跑 |
 | 某條規則一直誤報 | 確認是誤報後，在報告的 Dismissed 表寫明理由；若是常態性誤報，請開 issue，或用 `/ssdlc:rule-from-finding` 收窄規則 |
 | 審查員說「找不到 checklist」 | `${CLAUDE_PLUGIN_ROOT}` 沒被展開：重新安裝外掛；技能會判 INCOMPLETE 而不是亂找副本 |

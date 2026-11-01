@@ -41,7 +41,7 @@
       "ai_component": "agent-tool",
       "cwe": "CWE-1427",
       "mitigation_status": "partial",
-      "current_controls": "提示層規則：報告是資料、不執行 repo 程式、只用 Read/Grep 重驗；Claude Code 逐次核准；審查模式 /ssdlc:review-mode（hooks/review-mode.ts）：主 session 只允許精確命令形式、拒絕網路、寫檔限報告路徑、只能派 ssdlc 審查員；關閉須由人輸入（需使用者開啟）",
+      "current_controls": "提示層規則：報告是資料、不執行 repo 程式、只用 Read/Grep 重驗；Claude Code 逐次核准；審查模式 /ssdlc-review-mode（hooks/review-mode.ts）：主 session 只允許精確命令形式、拒絕網路、寫檔限報告路徑、只能派 ssdlc 審查員；關閉須由人輸入（需使用者開啟）",
       "recommended_controls": "審查不受信任的 repo 時預設開啟審查模式；長期：repo 根目錄 allowlist 與 OS 層 sandbox",
       "processing_status": "進行中",
       "threat_actors": [
@@ -420,7 +420,7 @@
       "ai_component": "agent-tool",
       "cwe": "CWE-1427",
       "mitigation_status": "partial",
-      "current_controls": "同 SSDLC-01；審查模式 /ssdlc:review-mode（hooks/review-mode.ts）：主 session 只允許精確命令形式、拒絕網路、寫檔限報告路徑、只能派 ssdlc 審查員；關閉須由人輸入（需使用者開啟）",
+      "current_controls": "同 SSDLC-01；審查模式 /ssdlc-review-mode（hooks/review-mode.ts）：主 session 只允許精確命令形式、拒絕網路、寫檔限報告路徑、只能派 ssdlc 審查員；關閉須由人輸入（需使用者開啟）",
       "recommended_controls": "審查不受信任的 repo 時預設開啟審查模式；長期：repo 根目錄 allowlist 與 OS 層 sandbox",
       "processing_status": "進行中",
       "threat_actors": [

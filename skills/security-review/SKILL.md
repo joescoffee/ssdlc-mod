@@ -15,7 +15,7 @@ Run a structured security review of a diff, a directory, or a whole repo.
 - Then spawn the **`ssdlc:security-reviewer`** agent (read-only) with the target and the scan output. Large targets: split by component, at most 4 reviewers in parallel; tell the user the estimated cost first if more are needed.
 - If the `ssdlc:*-reviewer` agent types are not available, **stop and report it** — never fall back to a general-purpose agent, which has shell and write access (OWASP ASI03).
 
-**Review mode.** For a repository you do not trust, ask the user to type `/ssdlc:review-mode on` first. It
+**Review mode.** For a repository you do not trust, ask the user to type `/ssdlc-review-mode on` first. It
 bounds this session in code: only the scanner, hardened read-only git, parse-only audits, listing and
 review-copy commands run; no network; writes only to report files; only ssdlc reviewers may be spawned.
 Write commands fully expanded (no `$VAR`), since variables and pipes are refused. Only the user can switch it off.

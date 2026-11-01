@@ -411,7 +411,7 @@
       "text": "審查模式",
       "color": null,
       "order": 5,
-      "note": "/ssdlc:review-mode：主 session 只允許精確命令形式、無網路、寫檔限報告、只派 ssdlc 審查員；只有人能關閉"
+      "note": "/ssdlc-review-mode：主 session 只允許精確命令形式、無網路、寫檔限報告、只派 ssdlc 審查員；只有人能關閉"
     },
     {
       "id": "s7",
