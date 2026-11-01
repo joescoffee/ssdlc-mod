@@ -1,0 +1,8 @@
+{"player": "防禦方(ssdlc)", "label": "公開承諾的拒絕策略", "moves": {
+  "靜默拒絕": {"player": "攻擊方(惡意repo作者)", "label": "是否植入外洩注入", "moves": {
+     "植入": {"payoff": {"攻擊方(惡意repo作者)": 3, "防禦方(ssdlc)": -4}},
+     "不植入": {"payoff": {"攻擊方(惡意repo作者)": 0, "防禦方(ssdlc)": 0}}}},
+  "警報即BLOCK": {"player": "攻擊方(惡意repo作者)", "label": "是否植入外洩注入", "moves": {
+     "植入": {"payoff": {"攻擊方(惡意repo作者)": -5, "防禦方(ssdlc)": 2}},
+     "不植入": {"payoff": {"攻擊方(惡意repo作者)": 0, "防禦方(ssdlc)": -1}}}}},
+ "note": "推估報酬（相對單位）：c = 良性 repo 誤觸警報的成本"}

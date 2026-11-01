@@ -1,0 +1,18 @@
+{
+  "title": "ssdlc mod 持續改進飛輪",
+  "nodes": [
+    {"id": "n1", "name": "審查執行（含自我審查）", "copy_cost": 2, "expiry_condition": "審查代理被宿主 API 變更靜默停用時"},
+    {"id": "n2", "name": "確認的發現（claim-check-act 驗證）", "copy_cost": 3, "expiry_condition": "未經驗證的發現被直接規則化（誤報被固化）時"},
+    {"id": "n3", "name": "規則化：規則＋植入缺陷＋安全對照＋測試", "copy_cost": 4, "expiry_condition": "規則數量膨脹到誤報率使使用者略過閘門時"},
+    {"id": "n4", "name": "自動覆蓋：掃描器與清單覆蓋 OWASP 2026", "copy_cost": 3, "expiry_condition": "OWASP 2026 改版而對照未更新時"},
+    {"id": "n5", "name": "採用：每個 PR 前都跑閘門", "copy_cost": 4, "expiry_condition": "閘門誤報或太慢，使用者改用 bypass 時"}
+  ],
+  "edges": [
+    {"from": "n1", "to": "n2", "strength": 1.3, "mechanism": "雙審查員產出可驗證的發現", "evidence": "observed"},
+    {"from": "n2", "to": "n3", "strength": 1.3, "mechanism": "每個確認發現轉成規則、植入缺陷與回歸測試", "evidence": "measured"},
+    {"from": "n3", "to": "n4", "strength": 1.2, "mechanism": "一致性測試迫使規則對應清單 ID，覆蓋矩陣變完整", "evidence": "measured"},
+    {"from": "n4", "to": "n1", "strength": 1.1, "mechanism": "機械掃描先擋掉明顯問題，審查員專注於設計層，審查更便宜", "evidence": "inferred"},
+    {"from": "n4", "to": "n5", "strength": 1.1, "mechanism": "覆蓋更完整、誤報可控 → 使用者信任閘門", "evidence": "assumed"},
+    {"from": "n5", "to": "n1", "strength": 1.2, "mechanism": "更多 PR 經過閘門，產生更多審查樣本", "evidence": "assumed"}
+  ]
+}

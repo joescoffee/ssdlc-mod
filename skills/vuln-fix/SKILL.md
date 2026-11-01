@@ -28,4 +28,5 @@ disable-model-invocation: true
 - Grep the codebase for the same pattern (same API, same idiom, copy-pasted code). Fix or list each variant.
 
 ## 6. Record
+If the defect is pattern-detectable, run `/ssdlc:rule-from-finding` so the gate catches it next time.
 Write a short fix note: ID, root cause, fix, test, variants found, residual risk, and whether disclosure/advisory is needed (for Taiwan-regulated entities consider `vulnerability-disclosure-tw` and incident-notification duties).
