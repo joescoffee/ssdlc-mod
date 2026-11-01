@@ -63,3 +63,23 @@ test('the main loop may still read anything the user allows', async ($, on) => {
   const r = await $.tool.call({ tool: 'Read', file_path: '/repo/.env' } as any)
   expect(r.deny).toBe(undefined)
 })
+
+test('globs aimed at credential stores are refused, content searches are not', async ($, on) => {
+  engine(on)
+  const { agentId } = await $.agent.spawn({ prompt: 'review', subagentType: 'ssdlc:security-reviewer' })
+  for (const [tool, args] of [
+    ['Grep', { pattern: 'KEY', path: '/repo', glob: '.env*' }],
+    ['Grep', { pattern: 'x', path: '/repo', glob: '**/*.pem' }],
+    ['Glob', { pattern: '**/.ssh/**' }],
+    ['Glob', { pattern: '**/id_ed25519' }],
+  ] as const) {
+    expect((await $.tool.call({ tool, ...args, agentId } as any)).deny).toMatch(/credential stores/)
+  }
+  for (const [tool, args] of [
+    ['Grep', { pattern: '\\.env$|password', path: '/repo/src' }],
+    ['Grep', { pattern: 'x', path: '/repo', glob: '*.env.example' }],
+    ['Glob', { pattern: 'src/**/*.ts' }],
+  ] as const) {
+    expect((await $.tool.call({ tool, ...args, agentId } as any)).deny).toBe(undefined)
+  }
+})

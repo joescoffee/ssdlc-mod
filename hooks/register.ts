@@ -21,11 +21,26 @@ const reviewers = new Set<string>()
 export const isReviewerType = (type: string | undefined): boolean =>
   type !== undefined && /^ssdlc:.*reviewer$/.test(type)
 
-/** Every path-like argument a read-only tool may carry. */
-export const touchedPaths = (e: Record<string, unknown>): string[] =>
-  ['file_path', 'path', 'pattern', 'glob']
-    .map(k => e[k])
-    .filter((v): v is string => typeof v === 'string')
+// Glob strings that aim at credential stores, e.g. `.env*`, `**` + `/.ssh/**`, `*.pem`.
+export const SENSITIVE_GLOB =
+  /(^|[\/\\*{,])\.env(?!\.(example|sample|template|dist)\b)|\.(ssh|aws|gnupg|kube|netrc|npmrc|pypirc|git-credentials|pgpass)\b|\.credentials\.json|id_(rsa|dsa|ecdsa|ed25519)|\.(pem|key|p12|pfx|kdbx)\b/
+
+/**
+ * The path-like arguments of each read-only tool. Grep's `pattern` searches
+ * file contents, so it is not a path and is not checked.
+ */
+export const touchedPaths = (tool: string, e: Record<string, unknown>): { paths: string[]; globs: string[] } => {
+  const str = (k: string) => (typeof e[k] === 'string' ? [e[k] as string] : [])
+  if (tool === 'Read') return { paths: str('file_path'), globs: [] }
+  if (tool === 'Grep') return { paths: str('path'), globs: str('glob') }
+  if (tool === 'Glob') return { paths: str('path'), globs: str('pattern') }
+  return { paths: [], globs: [] }
+}
+
+export const sensitiveTarget = (tool: string, e: Record<string, unknown>): string | undefined => {
+  const { paths, globs } = touchedPaths(tool, e)
+  return paths.find(p => SENSITIVE_PATH.test(p)) ?? globs.find(g => SENSITIVE_GLOB.test(g) || SENSITIVE_PATH.test(g))
+}
 
 export const register: Register = on => {
   on('agent.spawn', async ($, e, next) => {
@@ -41,7 +56,7 @@ export const register: Register = on => {
     if (!READ_ONLY.has(e.tool)) {
       return { deny: `${$.plugin.name}: reviewer agents are read-only (${e.tool} refused).` }
     }
-    const hit = touchedPaths(e as unknown as Record<string, unknown>).find(p => SENSITIVE_PATH.test(p))
+    const hit = sensitiveTarget(e.tool, e as unknown as Record<string, unknown>)
     if (hit !== undefined) {
       return {
         deny: `${$.plugin.name}: reviewers may not read credential stores (${hit}). Report the reference as a finding instead.`,

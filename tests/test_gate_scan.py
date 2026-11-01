@@ -126,5 +126,39 @@ class Cli(unittest.TestCase):
             self.assertEqual(gate_scan.scan_paths([d]), [])
 
 
+class RefsAndLinks(unittest.TestCase):
+    REF = __import__("re").compile(r"^(CWE-\d+|LLM(0[1-9]|10):2026|ASI(0[1-9]|10))$")
+
+    def test_every_rule_has_valid_refs(self):
+        for rule, _sev, refs, _rx in gate_scan.RULES:
+            self.assertTrue(refs, rule)
+            for r in refs:
+                self.assertRegex(r, self.REF, rule)
+
+    def test_refs_in_json_output(self):
+        f = gate_scan.scan_text("pickle.loads(b)", "t")[0]
+        self.assertIn("CWE-502", f.refs)
+
+    def test_symlink_escape_reported_not_followed(self):
+        with tempfile.TemporaryDirectory() as d:
+            outside, repo = os.path.join(d, "home"), os.path.join(d, "repo")
+            os.makedirs(outside); os.makedirs(repo)
+            secret = os.path.join(outside, "id_ed25519")
+            with open(secret, "w") as fh:
+                fh.write("-----BEGIN " + "OPENSSH PRIVATE KEY-----\n")
+            os.symlink(secret, os.path.join(repo, "notes.txt"))
+            os.symlink(outside, os.path.join(repo, "linkdir"))
+            found = gate_scan.scan_paths([repo])
+            self.assertEqual(sorted(f.rule for f in found), ["repo.symlink-escape"] * 2)
+            self.assertFalse(any("PRIVATE" in f.excerpt for f in found))
+
+    def test_symlink_inside_repo_is_fine(self):
+        with tempfile.TemporaryDirectory() as d:
+            with open(os.path.join(d, "a.txt"), "w") as fh:
+                fh.write("hello\n")
+            os.symlink("a.txt", os.path.join(d, "b.txt"))
+            self.assertEqual(gate_scan.scan_paths([d]), [])
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -79,19 +79,42 @@ def scan_text(text: str, path: str) -> list[Finding]:
 
 
 def iter_files(paths: list[str]):
+    """Yield (path, link_target) for regular files; symlinks are never followed.
+
+    link_target is set when the entry is a symlink, so the caller can report it
+    without reading through it (a planted link to ~/.ssh/id_rsa must not leak).
+    """
     for p in paths:
-        if os.path.isdir(p):
-            for root, dirs, files in os.walk(p):
+        if os.path.islink(p):
+            yield p, os.readlink(p)
+        elif os.path.isdir(p):
+            for root, dirs, files in os.walk(p):  # followlinks=False by default
                 dirs[:] = [d for d in dirs if d not in SKIP_DIRS]
+                for d in dirs:
+                    full = os.path.join(root, d)
+                    if os.path.islink(full):
+                        yield full, os.readlink(full)
                 for f in sorted(files):
-                    yield os.path.join(root, f)
+                    full = os.path.join(root, f)
+                    yield full, (os.readlink(full) if os.path.islink(full) else None)
         elif os.path.isfile(p):
-            yield p
+            yield p, None
+
+
+def link_escapes(link: str, target: str, roots: list[str]) -> bool:
+    resolved = os.path.realpath(os.path.join(os.path.dirname(link), target))
+    bases = [os.path.realpath(r if os.path.isdir(r) else os.path.dirname(r) or ".") for r in roots]
+    return not any(resolved == b or resolved.startswith(b + os.sep) for b in bases)
 
 
 def scan_paths(paths: list[str]) -> list[Finding]:
     findings: list[Finding] = []
-    for f in iter_files(paths):
+    for f, target in iter_files(paths):
+        if target is not None:
+            if link_escapes(f, target, paths):
+                findings.append(Finding("repo.symlink-escape", "high", f, 0,
+                                        f"symlink -> {target}", ["CWE-59", "ASI04", "LLM04:2026"]))
+            continue
         try:
             if os.path.getsize(f) > MAX_BYTES:
                 continue
