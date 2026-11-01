@@ -4,10 +4,10 @@
     "title": "SSDLC mod",
     "central_image": "🛡️",
     "mode": "bloom",
-    "version": 10,
+    "version": 14,
     "created": "2026-11-01T04:54:12+00:00",
     "id_seq": 0,
-    "updated": "2026-11-01T09:21:57+00:00"
+    "updated": "2026-11-01T12:05:33+00:00"
   },
   "nodes": [
     {
@@ -256,7 +256,7 @@
       "text": "植入缺陷",
       "color": null,
       "order": 0,
-      "note": "40 個單元測試：每條規則皆有植入缺陷與安全對照"
+      "note": "53 個單元測試：每條規則皆有植入缺陷與安全對照、審查回歸測試"
     },
     {
       "id": "t2",
@@ -271,7 +271,7 @@
       "text": "hook測試",
       "color": null,
       "order": 2,
-      "note": "9 個 guard hook 測試"
+      "note": "28 個 hook 測試：守門、白名單、審查模式、tripwire、存活檢查、歷史"
     },
     {
       "id": "i",
@@ -372,7 +372,7 @@
       "text": "嚴格模式",
       "color": null,
       "order": 7,
-      "note": "--strict 忽略 allow 標記；suppressed/skipped 皆列報"
+      "note": "allow 標記預設忽略（--honor-markers 才採用，永不隱藏 secret／隱形字元）；skipped 皆列報，結束碼 3＝INCOMPLETE"
     },
     {
       "id": "r",
@@ -411,7 +411,7 @@
       "text": "審查模式",
       "color": null,
       "order": 5,
-      "note": "/ssdlc-review-mode：主 session 只允許精確命令形式、無網路、寫檔限報告、只派 ssdlc 審查員；只有人能關閉"
+      "note": "一般訊息 ssdlc review-mode on|off|status（終端機也可用 /ssdlc-review-mode）：主 session 只允許精確命令形式、無網路、寫檔限報告、只派 ssdlc 審查員；只有人能關閉"
     },
     {
       "id": "s7",
@@ -610,6 +610,38 @@
         "h8"
       ],
       "at": "2026-11-01T09:21:57+00:00"
+    },
+    {
+      "v": 11,
+      "action": "update",
+      "ids": [
+        "t1"
+      ],
+      "at": "2026-11-01T12:05:33+00:00"
+    },
+    {
+      "v": 12,
+      "action": "update",
+      "ids": [
+        "t3"
+      ],
+      "at": "2026-11-01T12:05:33+00:00"
+    },
+    {
+      "v": 13,
+      "action": "update",
+      "ids": [
+        "g8"
+      ],
+      "at": "2026-11-01T12:05:33+00:00"
+    },
+    {
+      "v": 14,
+      "action": "update",
+      "ids": [
+        "s6"
+      ],
+      "at": "2026-11-01T12:05:33+00:00"
     }
   ]
 }

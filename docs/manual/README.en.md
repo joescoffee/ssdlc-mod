@@ -46,13 +46,13 @@ How it differs from an ordinary linter:
 
 **The whole picture in one diagram** (v0.5.0): the seven main branches are skills, reviewers (agents), guard hook, scanner, tests, installation and reference standards; dashed lines show how they relate.
 
-![Mind map of how ssdlc works (v0.5.0)](../ssdlc-mindmap.png)
+![Mind map of how ssdlc works (v0.5.0)](../ssdlc-mindmap.en.png)
 
-**The interactive version** (open `docs/ssdlc-mindmap.html` in a browser) lets you drag to pan, zoom with the scroll wheel or toolbar, click to select a node, double-click or press F2 to edit text, drag a node to move a branch, and press Tab to add a child node. When you are done, click "匯出 JSON（貼回給 Claude）" ("Export JSON (paste back to Claude)") and paste the result back into the conversation to sync it to the mind map's state file. The image below shows the view zoomed to 120% with the "存活檢查" ("liveness check") node selected:
+**The interactive version** (open `docs/ssdlc-mindmap.en.html` in a browser; the toolbar and hint text are Chinese) lets you drag to pan, zoom with the scroll wheel or toolbar, click to select a node, double-click or press F2 to edit text, drag a node to move a branch, and press Tab to add a child node. When you are done, click "匯出 JSON（貼回給 Claude）" ("Export JSON (paste back to Claude)") and paste the result back into the conversation to sync it to the mind map's state file. The image below shows the view zoomed to 120% with the "Liveness check" node selected:
 
-![Interactive mind map: zoomed in with a node selected](img/mindmap-interactive.png)
+![Interactive mind map: zoomed in with a node selected](img/mindmap-interactive.en.png)
 
-(Node notes currently live only in the `note` field of the state file `docs/mindmaps/ssdlc.mindmap.json`; the interactive view does not show them.)
+(Node notes currently live only in the `note` field of the state file `docs/mindmaps/ssdlc.en.mindmap.json`; the interactive view does not show them.)
 
 ---
 
@@ -431,7 +431,7 @@ Results verified on a real Claude app (review mode blocking `curl`, the reviewer
 5. **Unverified host behavior**: whether Claude Code's Grep searches hidden files, and whether a `CLAUDE.md` in a subdirectory is loaded when read, have not been tested.
 6. The reviewers are AI and can miss things or report false positives; every High finding is verified back against the code, but the final judgment is still yours.
 
-Full self-review and remediation: [`../reviews/ssdlc-0.2.0-self-review.en.md`](../reviews/ssdlc-0.2.0-self-review.en.md); threat model: [`../threat-model/report.md`](../threat-model/report.md) (Chinese); improvement strategy: [`../strategy/README.en.md`](../strategy/README.en.md).
+Full self-review and remediation: [`../reviews/ssdlc-0.2.0-self-review.en.md`](../reviews/ssdlc-0.2.0-self-review.en.md); threat model: [`../threat-model/report.en.md`](../threat-model/report.en.md); improvement strategy: [`../strategy/README.en.md`](../strategy/README.en.md).
 
 ---
 
@@ -463,6 +463,6 @@ claude plugin validate .                   # plugin structure check
 
 **Adding a rule**: follow the steps of `/ssdlc:rule-from-finding`. The consistency tests make sure rules, examples, tests and checklists stay in sync.
 
-**How it all works**: see [the mind map in Chapter 1](#1-what-is-ssdlc) (interactive version: `../ssdlc-mindmap.html`).
+**How it all works**: see [the mind map in Chapter 1](#1-what-is-ssdlc) (interactive version: `../ssdlc-mindmap.en.html`).
 
 **License**: the code is MIT; `references/ai-risk-checklist.md` and `references/mit-ai-risk-triage.md` are adapted from OWASP (CC BY-SA 4.0) and the MIT AI Risk Repository (CC BY 4.0) and are licensed CC BY-SA 4.0; sources are at the end of each file.

@@ -37,9 +37,9 @@ Full report (13 findings with file:line evidence): [`docs/reviews/egm-403d888.en
 Reported upstream: [google/elephant-goldfish-model#261](https://github.com/google/elephant-goldfish-model/issues/261) (F1–F5), [#262](https://github.com/google/elephant-goldfish-model/issues/262) (F6–F13).
 
 ## How it works
-![ssdlc mind map](docs/ssdlc-mindmap.png)
+![ssdlc mind map](docs/ssdlc-mindmap.en.png)
 
-Interactive version: `docs/ssdlc-mindmap.html` (zoom, pan, edit); state file `docs/mindmaps/ssdlc.mindmap.json`. Node labels are in Chinese.
+Interactive version: `docs/ssdlc-mindmap.en.html` (zoom, pan, edit; the toolbar text is Chinese); state file `docs/mindmaps/ssdlc.en.mindmap.json`. Chinese version: `docs/ssdlc-mindmap.png`.
 
 ## Skills
 | Command | Purpose |
@@ -83,7 +83,7 @@ Both have only `Read, Grep, Glob` in their frontmatter; the guard hook in `hooks
 `references/ai-risk-checklist.md` (OWASP 2026 item-by-item checks, tests and rule mapping), `references/mit-ai-risk-triage.md` (MIT 24-subdomain SSDLC triage and causal scenario grid), `references/untrusted-repo.md` (rules for handling an untrusted repository). The first two are adapted from Creative Commons works and are **CC BY-SA 4.0**; everything else is MIT.
 
 ## Strategy
-How threat modelling, game theory and the flywheel shaped this version: [`docs/strategy/README.en.md`](docs/strategy/README.en.md); threat model report (Chinese): [`docs/threat-model/report.md`](docs/threat-model/report.md).
+How threat modelling, game theory and the flywheel shaped this version: [`docs/strategy/README.en.md`](docs/strategy/README.en.md); threat model report: [`docs/threat-model/report.en.md`](docs/threat-model/report.en.md).
 
 ## Known limitations
 Disclosed items still open after the v0.2.0 self-review ([`docs/reviews/ssdlc-0.2.0-self-review.en.md`](docs/reviews/ssdlc-0.2.0-self-review.en.md)):

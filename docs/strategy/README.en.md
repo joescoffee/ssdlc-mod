@@ -9,7 +9,7 @@ Each of the three analyses answers one question, and they feed one another: thre
 - 12 CTARA records (with AI overlay: `LLMnn:2026`/`ASInn`, MAESTRO layer, agentic factors); attack success rate and effective risk computed with `calculate-risk-scores.py`; `lint-tara-records.py --mas`: 0 ERROR, 0 WARN. All six STRIDE categories have records; MAESTRO L1 and L2 are not applicable (rationale in `coverage_decisions` in `records.json`).
 - **Sensitivity finding**: injection into the main session (SSDLC-01) has an attack success rate of 0.245 (Medium, right at the 0.25 threshold) when per-action approval is required; the same threat under bypass/acceptEdits mode (SSDLC-01B) is **0.49 (High)**. The risk depends on the user's permission mode, not on the mod itself → a control that is independent of the permission mode is needed.
 - **Highest effective risk before treatment**: guard denials have no persistent record (SSDLC-10, R category), **High 3.0**.
-- Report: [`../threat-model/report.md`](../threat-model/report.md) (Chinese); records: `records.json` (input), `scored.json` (computed results).
+- Report: [`../threat-model/report.en.md`](../threat-model/report.en.md); records: `records.json` (input), `scored.json` (computed results).
 
 **Implementation**
 | Improvement | Corresponding record | Result |
