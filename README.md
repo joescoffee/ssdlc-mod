@@ -8,8 +8,11 @@ Security skills and truly read-only reviewer agents for Claude Code.
 
 ## 安裝 / Install
 ```
-/plugin install ssdlc --marketplace joescoffee/ssdlc-mod
+claude plugin install ssdlc --marketplace joescoffee/ssdlc-mod
 ```
+對話中：`/plugin install ssdlc --marketplace joescoffee/ssdlc-mod`。
+
+📘 **新手請從 [新手操作手冊](docs/manual/README.md) 開始**：安裝、五分鐘上手、六個技能逐步教學、審查不受信任 repo 的完整流程、掃描器 CLI 與 CI、疑難排解。
 
 ## 示範 / Demo
 ![ssdlc 實機示範](docs/demo.png)

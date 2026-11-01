@@ -1,7 +1,13 @@
 {
   "name": "ssdlc-mod",
-  "owner": { "name": "joescoffee" },
+  "owner": {
+    "name": "joescoffee"
+  },
   "plugins": [
-    { "name": "ssdlc", "source": "./", "description": "Secure SDLC toolkit: security review, pre-PR gate, vuln-fix workflow, read-only reviewer agents" }
+    {
+      "name": "ssdlc",
+      "source": "./",
+      "description": "Secure SDLC toolkit: security gate, security and AI/agent review (OWASP LLM Top 10 2026, Agentic Top 10 2026, MIT AI Risk Repository), review mode, read-only reviewers with tripwire guard, vuln-fix"
+    }
   ]
 }

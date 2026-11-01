@@ -4,10 +4,10 @@
     "title": "SSDLC mod",
     "central_image": "🛡️",
     "mode": "bloom",
-    "version": 8,
+    "version": 9,
     "created": "2026-11-01T04:54:12+00:00",
     "id_seq": 0,
-    "updated": "2026-11-01T05:47:27+00:00"
+    "updated": "2026-11-01T06:12:50+00:00"
   },
   "nodes": [
     {
@@ -404,6 +404,30 @@
       "color": null,
       "order": 2,
       "note": "AI Risk Repository V4：24 子域 A/B/C、因果情境格（CC BY 4.0）"
+    },
+    {
+      "id": "s6",
+      "parent": "s",
+      "text": "審查模式",
+      "color": null,
+      "order": 5,
+      "note": "/ssdlc:review-mode：主 session 只允許精確命令形式、無網路、寫檔限報告、只派 ssdlc 審查員；只有人能關閉"
+    },
+    {
+      "id": "s7",
+      "parent": "s",
+      "text": "規則化",
+      "color": null,
+      "order": 6,
+      "note": "/ssdlc:rule-from-finding：確認的發現 → 規則＋植入缺陷＋安全對照＋測試（飛輪）"
+    },
+    {
+      "id": "h6",
+      "parent": "h",
+      "text": "絆線",
+      "color": null,
+      "order": 5,
+      "note": "讀憑證或用禁用工具＝tripwire → 主 session 下一個工具結果附警報 → 判 BLOCK；guard_log 可查"
     }
   ],
   "links": [
@@ -551,6 +575,16 @@
         "r2"
       ],
       "at": "2026-11-01T05:47:27+00:00"
+    },
+    {
+      "v": 9,
+      "action": "apply(3)",
+      "ids": [
+        "s6",
+        "s7",
+        "h6"
+      ],
+      "at": "2026-11-01T06:12:50+00:00"
     }
   ]
 }
