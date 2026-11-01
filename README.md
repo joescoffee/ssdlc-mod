@@ -26,7 +26,7 @@ Security skills and truly read-only reviewer agents for Claude Code.
 
 ## Tests
 ```
-python3 -I -m unittest discover -s tests -v   # 22 tests, 8 planted defects
+python3 -I -m unittest discover -s tests -v   # 23 tests, 8 planted defects
 claude plugin test .                           # guard hook tests
 ```
 `tests/fixtures/` 內是**刻意植入漏洞**的範例檔，請勿匯入或執行。

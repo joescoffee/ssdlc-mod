@@ -95,6 +95,10 @@ class SecretPatterns(unittest.TestCase):
         f = gate_scan.scan_text("t = '" + token + "'", "t")[0]
         self.assertNotIn(token, f.excerpt)
 
+    def test_code_evidence_not_mangled(self):
+        f = gate_scan.scan_text("requests.get(url, verify=False)", "t")[0]
+        self.assertEqual(f.excerpt, "requests.get(url, verify=False)")
+
 
 class Cli(unittest.TestCase):
     def run_cli(self, *args):

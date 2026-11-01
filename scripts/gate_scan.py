@@ -50,11 +50,18 @@ class Finding:
 
 
 def redact(text: str) -> str:
-    """Show at most the first 4 chars of anything that looks like a secret value."""
+    """Show at most the first 4 chars of each long token in a secret match."""
     def cut(m: re.Match[str]) -> str:
         s = m.group(0)
         return s[:4] + "…" if len(s) > 8 else s
-    return re.sub(r"[A-Za-z0-9_\-/+=]{12,}", cut, text.strip())[:160]
+    return re.sub(r"[A-Za-z0-9_\-/+]{9,}", cut, text)
+
+
+def excerpt(line: str, rule: str, m: re.Match[str]) -> str:
+    """Code findings keep their evidence verbatim; secret findings hide the value."""
+    if rule.startswith("secret."):
+        line = line[: m.start()] + redact(m.group(0)) + line[m.end():]
+    return line.strip()[:160]
 
 
 def scan_text(text: str, path: str) -> list[Finding]:
@@ -63,8 +70,9 @@ def scan_text(text: str, path: str) -> list[Finding]:
         if ALLOW_MARK in line:
             continue
         for rule, sev, rx in RULES:
-            if rx.search(line):
-                out.append(Finding(rule, sev, path, n, redact(line)))
+            m = rx.search(line)
+            if m:
+                out.append(Finding(rule, sev, path, n, excerpt(line, rule, m)))
     return out
 
 
