@@ -436,6 +436,10 @@ Results verified on a real Claude app (review mode blocking `curl`, the reviewer
 
 Full self-review and remediation: [`../reviews/ssdlc-0.2.0-self-review.en.md`](../reviews/ssdlc-0.2.0-self-review.en.md); threat model: [`../threat-model/report.en.md`](../threat-model/report.en.md); improvement strategy: [`../strategy/README.en.md`](../strategy/README.en.md).
 
+Threat model summary: of the 12 threat records, none is still Critical or High after treatment; the two remaining Medium records are the scenario in item 1 above (the main conversation being injected while reviewing in bypass / acceptEdits mode) and the plugin supply chain (an unpinned update changing a hook or skill).
+
+[![Threat model summary](../threat-model/summary.en.png)](../threat-model/report.en.md)
+
 ---
 
 ## 13. Advanced: development, testing and contributing

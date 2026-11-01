@@ -436,6 +436,10 @@ hook 若因 Claude Code 更新而沒有載入，它無法自己報錯。所以 s
 
 完整的自我審查與處置：[`../reviews/ssdlc-0.2.0-self-review.md`](../reviews/ssdlc-0.2.0-self-review.md)；威脅模型：[`../threat-model/report.md`](../threat-model/report.md)；改善策略：[`../strategy/README.md`](../strategy/README.md)。
 
+威脅模型摘要：12 筆威脅紀錄中，處置後已沒有 Critical／High；剩下 2 筆 Medium：一筆是上面第 1 點的情境（在 bypass／acceptEdits 模式下審查，主對話被注入），另一筆是 plugin 供應鏈（未鎖版本的更新改變 hook 或 skill）。
+
+[![威脅模型摘要](../threat-model/summary.png)](../threat-model/report.md)
+
 ---
 
 ## 13. 進階：開發、測試與貢獻
