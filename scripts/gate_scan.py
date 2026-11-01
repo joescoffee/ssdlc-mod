@@ -17,26 +17,27 @@ MAX_BYTES = 2_000_000
 SKIP_DIRS = {".git", "node_modules", ".venv", "venv", "__pycache__", "dist", "build"}
 ALLOW_MARK = "ssdlc: allow"
 
-# (rule, severity, regex). Secrets first.
-RULES: list[tuple[str, str, re.Pattern[str]]] = [
-    ("secret.aws-access-key", "critical", re.compile(r"\b(AKIA|ASIA)[0-9A-Z]{16}\b")),
-    ("secret.github-token", "critical", re.compile(r"\b(gh[pousr]_[A-Za-z0-9]{36,}|github_pat_[A-Za-z0-9_]{60,})\b")),
-    ("secret.anthropic-key", "critical", re.compile(r"\bsk-ant-[A-Za-z0-9_\-]{20,}")),
-    ("secret.openai-key", "critical", re.compile(r"\bsk-(proj-)?[A-Za-z0-9]{32,}\b")),
-    ("secret.slack-token", "critical", re.compile(r"\bxox[abprs]-[A-Za-z0-9-]{10,}")),
-    ("secret.private-key", "critical", re.compile(r"-----BEGIN (RSA |EC |OPENSSH |DSA |PGP )?PRIVATE KEY-----")),
-    ("secret.hardcoded-credential", "high", re.compile(
+# (rule, severity, refs, regex). refs: CWE ids and OWASP 2026 ids
+# (LLMnn:2026 = LLM Top 10 2026, ASInn = Agentic Top 10 2026). Secrets first.
+RULES: list[tuple[str, str, list[str], re.Pattern[str]]] = [
+    ("secret.aws-access-key", "critical", ["CWE-798"], re.compile(r"\b(AKIA|ASIA)[0-9A-Z]{16}\b")),
+    ("secret.github-token", "critical", ["CWE-798"], re.compile(r"\b(gh[pousr]_[A-Za-z0-9]{36,}|github_pat_[A-Za-z0-9_]{60,})\b")),
+    ("secret.anthropic-key", "critical", ["CWE-798", "LLM02:2026"], re.compile(r"\bsk-ant-[A-Za-z0-9_\-]{20,}")),
+    ("secret.openai-key", "critical", ["CWE-798", "LLM02:2026"], re.compile(r"\bsk-(proj-)?[A-Za-z0-9]{32,}\b")),
+    ("secret.slack-token", "critical", ["CWE-798"], re.compile(r"\bxox[abprs]-[A-Za-z0-9-]{10,}")),
+    ("secret.private-key", "critical", ["CWE-321"], re.compile(r"-----BEGIN (RSA |EC |OPENSSH |DSA |PGP )?PRIVATE KEY-----")),
+    ("secret.hardcoded-credential", "high", ["CWE-798"], re.compile(
         r"""(?i)\b(password|passwd|pwd|secret|api_?key|access_?token|auth_?token)\b\s*[:=]\s*["'][^"'\s]{8,}["']""")),
-    ("code.shell-injection", "high", re.compile(r"subprocess\.\w+\([^)]*shell\s*=\s*True|\bos\.system\(|\bos\.popen\(")),
-    ("code.eval", "high", re.compile(r"(?<![\w.])(eval|exec)\s*\(|new\s+Function\s*\(")),
-    ("code.unsafe-deserialization", "high", re.compile(
+    ("code.shell-injection", "high", ["CWE-78"], re.compile(r"subprocess\.\w+\([^)]*shell\s*=\s*True|\bos\.system\(|\bos\.popen\(")),
+    ("code.eval", "high", ["CWE-95"], re.compile(r"(?<![\w.])(eval|exec)\s*\(|new\s+Function\s*\(")),
+    ("code.unsafe-deserialization", "high", ["CWE-502"], re.compile(
         r"\bpickle\.loads?\(|\bmarshal\.loads?\(|\byaml\.load\((?![^)]*Loader\s*=\s*yaml\.(Safe|CSafe)Loader)")),
-    ("code.sql-string-build", "high", re.compile(
+    ("code.sql-string-build", "high", ["CWE-89"], re.compile(
         r"""(?i)\.execute\(\s*(f["']|["'][^"']*\b(select|insert|update|delete)\b[^"']*["']\s*(%|\+|\.format))""")),
-    ("code.tls-verify-disabled", "medium", re.compile(
+    ("code.tls-verify-disabled", "medium", ["CWE-295"], re.compile(
         r"verify\s*=\s*False|rejectUnauthorized\s*:\s*false|InsecureSkipVerify\s*:\s*true|NODE_TLS_REJECT_UNAUTHORIZED\s*=\s*['\"]?0")),
-    ("code.weak-hash", "medium", re.compile(r"\bhashlib\.(md5|sha1)\(|createHash\(\s*['\"](md5|sha1)['\"]")),
-    ("code.insecure-random-token", "low", re.compile(r"(?i)(token|secret|nonce|password)\w*\s*=\s*.*\brandom\.(random|randint|choice)\(")),
+    ("code.weak-hash", "medium", ["CWE-328"], re.compile(r"\bhashlib\.(md5|sha1)\(|createHash\(\s*['\"](md5|sha1)['\"]")),
+    ("code.insecure-random-token", "low", ["CWE-338"], re.compile(r"(?i)(token|secret|nonce|password)\w*\s*=\s*.*\brandom\.(random|randint|choice)\(")),
 ]
 
 
@@ -47,6 +48,7 @@ class Finding:
     file: str
     line: int
     excerpt: str
+    refs: list[str]
 
 
 def redact(text: str) -> str:
@@ -69,10 +71,10 @@ def scan_text(text: str, path: str) -> list[Finding]:
     for n, line in enumerate(text.splitlines(), 1):
         if ALLOW_MARK in line:
             continue
-        for rule, sev, rx in RULES:
+        for rule, sev, refs, rx in RULES:
             m = rx.search(line)
             if m:
-                out.append(Finding(rule, sev, path, n, excerpt(line, rule, m)))
+                out.append(Finding(rule, sev, path, n, excerpt(line, rule, m), list(refs)))
     return out
 
 
@@ -114,7 +116,7 @@ def main(argv: list[str]) -> int:
         print(json.dumps([asdict(f) for f in findings], ensure_ascii=False, indent=2))
     else:
         for f in findings:
-            print(f"{f.severity.upper():8} {f.rule:32} {f.file}:{f.line}  {f.excerpt}")
+            print(f"{f.severity.upper():8} {f.rule:32} {f.file}:{f.line}  {f.excerpt}  [{', '.join(f.refs)}]")
         print(f"{len(findings)} finding(s)")
     return 1 if findings else 0
 
