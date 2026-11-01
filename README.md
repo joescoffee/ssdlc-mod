@@ -89,6 +89,8 @@ Both have only `Read, Grep, Glob` in their frontmatter; the guard hook in `hooks
 ## Strategy
 How threat modelling, game theory and the flywheel shaped this version: [`docs/strategy/README.en.md`](docs/strategy/README.en.md); threat model report: [`docs/threat-model/report.en.md`](docs/threat-model/report.en.md).
 
+[![Threat model summary](docs/threat-model/summary.en.png)](docs/threat-model/report.en.md)
+
 ## Known limitations
 Disclosed items still open after the v0.2.0 self-review ([`docs/reviews/ssdlc-0.2.0-self-review.en.md`](docs/reviews/ssdlc-0.2.0-self-review.en.md)):
 

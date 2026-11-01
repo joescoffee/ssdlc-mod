@@ -89,6 +89,8 @@ claude plugin install ssdlc --marketplace joescoffee/ssdlc-mod
 ## 改善策略
 威脅建模、賽局分析與飛輪如何決定這一版的改善：[`docs/strategy/README.md`](docs/strategy/README.md)；威脅模型報告：[`docs/threat-model/report.md`](docs/threat-model/report.md)。
 
+[![威脅模型摘要](docs/threat-model/summary.png)](docs/threat-model/report.md)
+
 ## 已知限制
 經 v0.2.0 自我審查（[`docs/reviews/ssdlc-0.2.0-self-review.md`](docs/reviews/ssdlc-0.2.0-self-review.md)）後仍未解決、如實揭露的項目：
 
