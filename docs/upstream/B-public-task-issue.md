@@ -1,6 +1,6 @@
 <!--
 Channel: PUBLIC issue on google/elephant-goldfish-model, template "Task".
-Can be filed now: the findings are public (joescoffee/ssdlc-mod, public since 2026-11-01). If draft A was filed as a public issue, add "Related: #<its number>" at the end.
+Can be filed now: the findings are public (joescoffee/ssdlc-mod, public since 2026-11-01). Draft A was filed as #261; the body already ends with "Related: #261".
 -->
 
 **Title:** Hardening: constrain file paths, write targets, and parallelism; align safety claims in docs
@@ -25,3 +25,8 @@ These are low-severity hardening items from a read-only security review of `403d
 - Each item is either changed or explicitly documented as accepted, with a rationale.
 - Unit tests cover the new path and write constraints where they are expressed in manifests (for example, extend `tests/unit/test_harnesses.py`).
 - `docs/harnesses.md` states, per host, whether reviewer read-only is host-enforced or prompt-only.
+
+Related: #261 (the medium-severity findings from the same review).
+
+---
+*Prepared with AI assistance (Claude, via a read-only two-reviewer static review); I reviewed the findings and the citations before filing.*

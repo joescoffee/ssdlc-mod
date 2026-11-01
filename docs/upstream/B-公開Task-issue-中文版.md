@@ -1,7 +1,7 @@
 <!--
 【中文審閱版，送出時請用英文版 B-public-task-issue.md】
 管道：在 google/elephant-goldfish-model 開公開 issue，使用「Task」模板。
-可以直接送出：這些發現已經公開（joescoffee/ssdlc-mod 自 2026-11-01 起公開）。若草稿 A 也開成公開 issue，請在文末加上「Related: #<A 的 issue 編號>」。
+可以直接送出：這些發現已經公開（joescoffee/ssdlc-mod 自 2026-11-01 起公開）。草稿 A 已送出為 #261，內文結尾已加上「Related: #261」。
 -->
 
 **標題：** 強化：限制檔案路徑、寫入目標與平行數；讓文件中的安全宣稱與實際一致
@@ -26,3 +26,8 @@
 - 每一項都已修改，或明確記錄為「接受此風險」並附理由。
 - 能在 manifest 中表達的路徑／寫入限制，都有 unit test 涵蓋（例如擴充 `tests/unit/test_harnesses.py`）。
 - `docs/harnesses.md` 逐一標明各 host 的 reviewer 唯讀，是由 host 強制還是只靠提示文字。
+
+Related: #261（同一次審查中的 Medium 等級發現）。
+
+---
+*以 AI 協助撰寫（Claude，唯讀雙審查員靜態審查）；送出前已由我本人審閱發現與引用。*
