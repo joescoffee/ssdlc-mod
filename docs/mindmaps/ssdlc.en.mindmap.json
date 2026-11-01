@@ -4,10 +4,10 @@
     "title": "SSDLC mod",
     "central_image": "🛡️",
     "mode": "bloom",
-    "version": 5,
+    "version": 6,
     "created": "2026-11-01T12:05:57+00:00",
     "id_seq": 0,
-    "updated": "2026-11-01T14:43:02+00:00"
+    "updated": "2026-11-01T22:55:32+00:00"
   },
   "nodes": [
     {
@@ -470,6 +470,40 @@
       "color": null,
       "order": 1,
       "note": "Backfilled historical release; tag at 9a1ff5b"
+    },
+    {
+      "id": "r4",
+      "parent": "r",
+      "text": "Threat model",
+      "color": null,
+      "order": 3,
+      "note": "Summary image: docs/threat-model/summary.en.png; full report: docs/threat-model/report.en.md",
+      "icon": "📊",
+      "source": "docs/threat-model/summary.en.png"
+    },
+    {
+      "id": "r4a",
+      "parent": "r4",
+      "text": "12 records",
+      "color": null,
+      "order": 0,
+      "note": "12 threat records; 5 rated Critical / High before treatment"
+    },
+    {
+      "id": "r4b",
+      "parent": "r4",
+      "text": "No high residual",
+      "color": null,
+      "order": 1,
+      "note": "None is Critical or High after treatment"
+    },
+    {
+      "id": "r4c",
+      "parent": "r4",
+      "text": "2 Medium",
+      "color": null,
+      "order": 2,
+      "note": "Two Medium remain: CTARA-SSDLC-01B (main conversation injected in bypass / acceptEdits mode) and CTARA-SSDLC-07 (plugin supply chain)"
     }
   ],
   "links": [
@@ -599,6 +633,17 @@
         "i3b"
       ],
       "at": "2026-11-01T14:43:02+00:00"
+    },
+    {
+      "v": 6,
+      "action": "apply(4)",
+      "ids": [
+        "r4",
+        "r4a",
+        "r4b",
+        "r4c"
+      ],
+      "at": "2026-11-01T22:55:32+00:00"
     }
   ]
 }

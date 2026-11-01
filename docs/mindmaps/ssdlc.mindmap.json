@@ -4,10 +4,10 @@
     "title": "SSDLC mod",
     "central_image": "🛡️",
     "mode": "bloom",
-    "version": 17,
+    "version": 18,
     "created": "2026-11-01T04:54:12+00:00",
     "id_seq": 0,
-    "updated": "2026-11-01T14:43:02+00:00"
+    "updated": "2026-11-01T22:55:32+00:00"
   },
   "nodes": [
     {
@@ -470,6 +470,40 @@
       "color": null,
       "order": 1,
       "note": "補發的歷史版本，tag 指向 9a1ff5b"
+    },
+    {
+      "id": "r4",
+      "parent": "r",
+      "text": "威脅模型",
+      "color": null,
+      "order": 3,
+      "note": "摘要圖：docs/threat-model/summary.png；完整報告：docs/threat-model/report.md",
+      "icon": "📊",
+      "source": "docs/threat-model/summary.png"
+    },
+    {
+      "id": "r4a",
+      "parent": "r4",
+      "text": "12筆紀錄",
+      "color": null,
+      "order": 0,
+      "note": "12 筆威脅紀錄，其中 5 筆原始風險為 Critical／High"
+    },
+    {
+      "id": "r4b",
+      "parent": "r4",
+      "text": "零高風險",
+      "color": null,
+      "order": 1,
+      "note": "處置後沒有任何 Critical／High"
+    },
+    {
+      "id": "r4c",
+      "parent": "r4",
+      "text": "2筆中度",
+      "color": null,
+      "order": 2,
+      "note": "剩 2 筆 Medium：CTARA-SSDLC-01B（bypass／acceptEdits 模式下主對話被注入）、CTARA-SSDLC-07（plugin 供應鏈）"
     }
   ],
   "links": [
@@ -692,6 +726,17 @@
         "i3b"
       ],
       "at": "2026-11-01T14:43:02+00:00"
+    },
+    {
+      "v": 18,
+      "action": "apply(4)",
+      "ids": [
+        "r4",
+        "r4a",
+        "r4b",
+        "r4c"
+      ],
+      "at": "2026-11-01T22:55:32+00:00"
     }
   ]
 }
