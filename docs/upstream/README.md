@@ -1,3 +1,5 @@
+[English](README.en.md) | **繁體中文**
+
 # 上游回報草稿：google/elephant-goldfish-model
 
 依據 [`../reviews/egm-403d888.md`](../reviews/egm-403d888.md) 撰寫。

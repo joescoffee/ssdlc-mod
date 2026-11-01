@@ -1,3 +1,5 @@
+[English](ssdlc-0.2.0-self-review.en.md) | **繁體中文**
+
 # ssdlc v0.2.0 自我審查與處置（2026-11-01）
 
 以本 mod 自己的 `/ssdlc:ai-security-review` 流程審查自己：goldfish（`ssdlc:security-reviewer`，只看程式碼）回報 22 項（判定 BLOCK），elephant（`ssdlc:design-reviewer`，威脅建模＋MIT 因果格）回報 22 項威脅（T1–T22）。兩份合併後依下表處置，v0.2.1 修正。
