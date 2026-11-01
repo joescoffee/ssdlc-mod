@@ -13,6 +13,10 @@
 
 我們以唯讀方式審查這個 repo，找到五項 Medium 等級的問題。沒有後門或惡意程式碼，Claude Code 的 reviewer adapter 也正確限制為 `Read, Grep, Glob`。但當 EGM 審查**不受信任的 repo** 時，這些問題讓該 repo 的內容有機會觸發程式執行或不受限的檔案寫入。另有一項問題影響 release 簽章（attestation）的完整性。
 
+## 先前曝光（揭露說明）
+
+這些發現的報告（我的 repo `joescoffee/ssdlc-mod` 中的 `docs/reviews/egm-403d888.md`）曾不慎公開約 15 分鐘：從 2026-11-01 05:06 UTC 起，到約 05:19 UTC 將 repo 改為私有為止。我不知道有誰存取過，但在這段期間內可能已被 clone 或快取。在修正版發布或你們同意揭露之前，該 repo 會維持私有。
+
 ## 1. egm-bootstrap 會執行目標 repo 設定的 formatter（程式碼執行）
 
 - `skills/egm-bootstrap/SKILL.md:60-64, 323-326` 告訴 orchestrator：「如果 repo 有設定」markdown formatter（例如 `npx prettier --write`），就「可以執行」。
