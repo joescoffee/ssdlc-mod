@@ -10,7 +10,7 @@ Run a structured security review of a diff, a directory, or a whole repo.
 ## 0. Set the target
 - Diff: `git diff --merge-base origin/HEAD` (or the branch/PR given). Whole repo if nothing is pending.
 - Run the mechanical scan first, it is cheap and catches the obvious:
-  `python3 -I ${CLAUDE_PLUGIN_ROOT}/scripts/gate_scan.py <paths…>`
+  `python3 -I ${CLAUDE_PLUGIN_ROOT}/scripts/gate_scan.py --strict <paths…>` (`--strict`: the reviewed code may carry its own `ssdlc: allow` markers)
 - Then spawn the **`ssdlc:security-reviewer`** agent (read-only) with the target and the scan output. Large targets: split by component, one reviewer each, in parallel.
 
 ## Checklist (the reviewer walks all 10)
@@ -23,7 +23,7 @@ Run a structured security review of a diff, a directory, or a whole repo.
 6. **Secrets** — no keys, tokens, passwords, private keys in code, tests, fixtures, logs or history; secrets from a vault/env; nothing secret in error messages.
 7. **Cryptography & transport** — no MD5/SHA1 for security, no ECB, no hand-rolled crypto, CSPRNG for tokens, TLS verification never disabled (`verify=False`, `rejectUnauthorized:false`, `InsecureSkipVerify`).
 8. **Dependencies & supply chain** — new/changed deps pinned, from the expected registry, no known CVEs (`pip-audit`, `npm audit`, `osv-scanner` when available), no install scripts fetching remote code, lockfile updated.
-9. **AI / agent risks** — prompt injection via any text the model reads (docs, issues, web, tool output); tools granted wider than the task (excessive agency); model output used in a sink without validation (insecure output handling); secrets or PII placed in prompts; agents that auto-follow links or execute formatters/scripts from the repo.
+9. **AI / agent risks** — prompt injection via any text the model reads (docs, issues, web, tool output); tools granted wider than the task (excessive agency); model output used in a sink without validation (insecure output handling); secrets or PII placed in prompts; agents that auto-follow links or execute formatters/scripts from the repo. **If the code calls a model, runs agents or tools, or configures MCP, RAG or memory, run `/ssdlc:ai-security-review`** (OWASP LLM Top 10 2026, Agentic Top 10 2026, MIT causal grid) and include its coverage matrix.
 10. **Logging, errors & resilience** — security events logged without secrets/PII; errors fail closed; rate limits/size limits on expensive operations.
 
 ## Output

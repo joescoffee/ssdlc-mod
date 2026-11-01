@@ -203,6 +203,31 @@ class AiAgentRules(unittest.TestCase):
         self.assertEqual(reasons, ["binary (NUL byte)", "directory skipped by default"])
 
 
+class ChecklistConsistency(unittest.TestCase):
+    """references/ai-risk-checklist.md and the scanner must name the same rules."""
+    EXTRA = {"ai.mcp-unpinned", "ai.mcp-inline-secret", "ai.mcp-plaintext-transport", "repo.symlink-escape"}
+
+    def setUp(self):
+        import re as _re
+        with open(os.path.join(ROOT, "references", "ai-risk-checklist.md"), encoding="utf-8") as fh:
+            text = fh.read()
+        self.named = set(_re.findall(r"`((?:ai|code|repo)\.[a-z0-9-]+)`", text))
+        self.prefix = {m for m in _re.findall(r"`(secret)\.\*`", text)}
+        self.defined = {r[0] for r in gate_scan.RULES} | self.EXTRA
+
+    def test_checklist_names_only_real_rules(self):
+        self.assertEqual(self.named - self.defined, set())
+
+    def test_every_ai_rule_is_in_the_checklist(self):
+        ai = {r for r in self.defined if r.startswith(("ai.", "repo."))}
+        self.assertEqual(ai - self.named, set())
+
+    def test_every_ai_rule_cites_owasp_2026(self):
+        for rule, _sev, refs, _rx in gate_scan.RULES:
+            if rule.startswith("ai."):
+                self.assertTrue(any(r.endswith(":2026") or r.startswith("ASI") for r in refs), rule)
+
+
 class RefsAndLinks(unittest.TestCase):
     REF = __import__("re").compile(r"^(CWE-\d+|LLM(0[1-9]|10):2026|ASI(0[1-9]|10))$")
 

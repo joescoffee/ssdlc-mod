@@ -1,7 +1,7 @@
 {
   "name": "ssdlc",
-  "version": "0.1.0",
-  "description": "Secure SDLC toolkit: security review, pre-PR gate, vuln-fix workflow, and truly read-only reviewer agents",
+  "version": "0.2.0",
+  "description": "Secure SDLC toolkit: security review, AI/agent review (OWASP LLM Top 10 2026, Agentic Top 10 2026, MIT AI Risk Repository), pre-PR gate, vuln-fix workflow, and hook-enforced read-only reviewer agents",
   "license": "MIT",
   "author": {
     "name": "joescoffee"

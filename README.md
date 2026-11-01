@@ -36,7 +36,8 @@ Security skills and truly read-only reviewer agents for Claude Code.
 | Command | 用途 |
 |---|---|
 | `/ssdlc:security-review` | 10 段安全標準審查：範圍、信任邊界、STRIDE、認證授權、危險輸入、secrets、密碼學、依賴、AI/代理風險、日誌 |
-| `/ssdlc:security-gate` | PR 前閘門：secrets＋危險模式掃描、依賴漏洞稽核、diff 審查 → PASS / WARN / BLOCK |
+| `/ssdlc:ai-security-review` | LLM／RAG／代理程式審查：依 OWASP LLM Top 10 2026（`LLM01–10:2026`）、OWASP Agentic Top 10 2026（`ASI01–10`）與 MIT AI Risk Repository 因果分類；盤點 → 掃描 → Rule of Two 設計閘門 → 雙審查員 → 覆蓋矩陣 |
+| `/ssdlc:security-gate` | PR 前閘門：secrets、危險模式與 AI／代理設定掃描、依賴稽核（只解析、不安裝、不執行專案程式）、diff 審查 → PASS / WARN / BLOCK / INCOMPLETE |
 | `/ssdlc:vuln-fix` | 漏洞修復流程：分類 → 複現 → 根因修復 → 回歸測試 → 變體搜尋 → 紀錄 |
 | `/ssdlc:safe-bootstrap` | EGM（Elephant-Goldfish Model）bootstrap 的真正唯讀版本 |
 
@@ -44,14 +45,32 @@ Security skills and truly read-only reviewer agents for Claude Code.
 - `ssdlc:security-reviewer` — 程式碼／diff 安全審查
 - `ssdlc:design-reviewer` — 設計文件威脅建模（STRIDE + AI 風險）
 
-兩者 frontmatter 只有 `Read, Grep, Glob`；另有 `hooks/register.ts` 守門 hook，凡 `ssdlc:*reviewer` 子代理呼叫 Read/Grep/Glob 及回報用的 `SubagentHandback` 以外的工具一律拒絕（縱深防禦）。
+兩者 frontmatter 只有 `Read, Grep, Glob`；`hooks/register.ts` 守門 hook 再加三層縱深防禦（OWASP ASI02／ASI03、LLM02:2026）：
+- 審查代理呼叫 Read/Grep/Glob 與回報用的 `SubagentHandback` 以外的工具，一律拒絕；
+- 不得讀取憑證儲存處（`~/.ssh`、`~/.aws`、`.env*`、金鑰檔、`~/.claude/.credentials.json`、`/proc` 等），含 Grep/Glob 的 glob 參數；
+- 先以 `$.fs.stat` 解析 symlink 實際落點再判斷，repo 內指向憑證的連結也會被擋；每次拒絕都跳出提示。
 
 ## Scanner
-`scripts/gate_scan.py` 只用標準函式庫、不連網，偵測 secrets 與危險程式模式（shell injection、eval、不安全反序列化、SQL 字串組合、關閉 TLS 驗證、弱雜湊）。行尾加 `# ssdlc: allow <理由>` 可抑制單行。
+`scripts/gate_scan.py` 只用標準函式庫、不連網、不跟隨 symlink。每筆發現附 `refs`（CWE、`LLMnn:2026`、`ASInn`）。
+
+| 類別 | 規則 |
+|---|---|
+| Secrets | AWS／GitHub／Anthropic／OpenAI／Slack 金鑰、私鑰、硬編碼帳密（只顯示前 4 字元） |
+| 一般程式 | shell injection、eval、不安全反序列化、SQL 字串組合、關閉 TLS 驗證、弱雜湊、弱亂數 |
+| 提示載體（LLM01:2026） | Unicode tag 隱寫（**解碼顯示隱藏文字**、不回顯原字元）、零寬／bidi 字元、注入片語 |
+| 模型供應鏈（LLM04:2026） | `trust_remote_code`、`allow_dangerous_deserialization`、不安全模型載入、未鎖版本模型、LangChain `loads`、對外暴露的 Ray／Weaviate |
+| 代理權限（LLM03:2026、ASI02／05） | 核准繞過（`bypassPermissions`、`--dangerously-skip-permissions`、`autoApprove`、`--yolo`）、萬用允許清單、開放式 REPL／shell 工具、未沙箱執行、無上限迴圈、開啟即執行的設定（`.git/config` fsmonitor、`runOn: folderOpen`）、模型輸出進 HTML sink |
+| MCP 設定（JSON 解析） | 未鎖版本的 `npx`／`uvx`／`@latest`、`env`／`headers` 內嵌密鑰、非本機的明文 HTTP |
+| Repo | 指向 repo 外的 symlink |
+
+`# ssdlc: allow <理由>` 可抑制單行（必須附理由，且會列在報告的 suppressed）；審查不受信任的 repo 時一律加 `--strict` 忽略標記。超過大小、二進位或預設略過的目錄會列為 skipped。
+
+## References
+`references/ai-risk-checklist.md`（OWASP 2026 逐項審查、測試與規則對照）、`references/mit-ai-risk-triage.md`（MIT 24 子域 SSDLC 分流與因果情境格）。這兩份改編自 CC 授權文件，採 **CC BY-SA 4.0**；其餘程式碼為 MIT。
 
 ## Tests
 ```
-python3 -I -m unittest discover -s tests -v   # 23 tests, 8 planted defects
-claude plugin test .                           # guard hook tests
+python3 -I -m unittest discover -s tests -v   # 40 tests: planted defects for every rule + safe counterparts
+claude plugin test .                           # 9 guard hook tests
 ```
 `tests/fixtures/` 內是**刻意植入漏洞**的範例檔，請勿匯入或執行。
