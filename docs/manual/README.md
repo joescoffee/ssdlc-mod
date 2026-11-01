@@ -46,7 +46,11 @@ ssdlc 是一個 **Claude Code 外掛（plugin）**，把安全軟體開發生命
 
 ![ssdlc 運作方式心智圖（v0.5.0）](../ssdlc-mindmap.png)
 
-（互動版可縮放、展開每個節點的說明：`docs/ssdlc-mindmap.html`）
+**互動版**（用瀏覽器開啟 `docs/ssdlc-mindmap.html`）可以拖曳平移、滾輪或工具列縮放、單擊選取節點、雙擊或 F2 編輯文字、拖拉節點搬移分支、Tab 新增子節點；改完按「匯出 JSON（貼回給 Claude）」，貼回對話即可同步到心智圖狀態檔。下圖為放大到 120%、選取「存活檢查」節點的畫面：
+
+![互動版心智圖：放大並選取節點](img/mindmap-interactive.png)
+
+（節點的補充說明目前只存在狀態檔 `docs/mindmaps/ssdlc.mindmap.json` 的 `note` 欄位，互動版畫面不會顯示。）
 
 ---
 

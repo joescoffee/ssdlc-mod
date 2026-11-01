@@ -9,4 +9,4 @@
 | `B-public-task-issue.md` | 8 項低風險強化（F6–F13） | 公開 issue（Task 模板） | 等 A 回覆後再發 |
 | `B-公開Task-issue-中文版.md` | B 的中文審閱版 | 不送出 | — |
 
-> ⚠️ 本 repo 在上游修正前應維持 **Private**；改回公開前，請先確認 Google 已修正或同意公開。
+> 📌 2026-11-01：維護者決定公開本 repo（含這些草稿與 `docs/reviews/egm-403d888.md`）。若草稿 A 尚未送出，送出時請在「先前曝光」一節更新為「已公開」。
