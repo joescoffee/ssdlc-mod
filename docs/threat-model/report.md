@@ -4,6 +4,10 @@
 
 > 版本：1.0 | 作者：— | 產生日期：2026-11-01
 
+![威脅模型摘要](summary.png)
+
+摘要圖由 `make_summary.py` 依 `scored.json` 計算產生（`summary.html` 截圖）。
+
 ## 安全態勢總覽
 
 **安全態勢評級：🔴 CRITICAL**（扣分：130.0）

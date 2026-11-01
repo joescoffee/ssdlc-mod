@@ -1,0 +1,37 @@
+<!doctype html><html lang="zh-Hant"><meta charset="utf-8">
+<title>ssdlc 威脅模型摘要</title>
+<style>
+:root{--surface:#fcfcfb;--page:#eef1f5;--text:#0b0b0b;--text2:#52514e;--muted:#8a8984;--grid:#e4e3df;
+--series:#2a78d6;--good:#0ca30c;--warning:#fab219;--serious:#ec835a;--critical:#d03b3b;--neutral:#b9b8b2}
+body{margin:0;padding:28px;background:var(--page);color:var(--text);font:15px/1.45 'Noto Sans TC','Noto Sans',sans-serif;width:1224px}
+h1{margin:0;font-size:24px} h1 img{width:34px;vertical-align:-8px;margin-right:10px;border-radius:8px}
+.sub{color:var(--text2);margin:4px 0 18px 46px;font-size:13px}
+.card{background:var(--surface);border-radius:12px;padding:18px 20px;box-shadow:0 2px 10px #0001}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px}
+.num{font-size:44px;font-weight:700;line-height:1.1} .tl{font-weight:600;margin-top:2px} .ts{color:var(--text2);font-size:13px}
+.tile{background:var(--surface);border-radius:12px;padding:16px 20px;box-shadow:0 2px 10px #0001}
+h2{font-size:15px;margin:0 0 12px;color:var(--text)}
+.stack{display:flex;gap:2px;height:22px;border-radius:4px;overflow:hidden;margin:6px 0 10px}
+.lg{margin-right:22px;color:var(--text2);font-size:14px} .lg i,.pill i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:0}
+.lg b{color:var(--text)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}
+.brow{display:flex;align-items:center;margin:7px 0} .blab{width:150px;color:var(--text2);font-size:13.5px}
+.btrack{flex:1;display:flex;align-items:center;gap:8px} .bar{height:14px;background:var(--series);border-radius:0 4px 4px 0}
+.bval{font-size:13.5px;font-weight:600} .muted{color:var(--muted);font-weight:400}
+table{width:100%;border-collapse:collapse;font-size:14px} th{text-align:left;color:var(--text2);font-weight:600;border-bottom:1px solid var(--grid);padding:6px 8px}
+td{padding:8px;border-bottom:1px solid var(--grid);vertical-align:top} tr:last-child td{border-bottom:0}
+.mono{font-family:'DejaVu Sans Mono',monospace;font-size:13px;white-space:nowrap} .pill{white-space:nowrap}
+.foot{color:var(--text2);font-size:12.5px;margin-top:14px}
+</style>
+<h1><img src="../../.claude-plugin/icon.png">ssdlc 威脅模型摘要</h1>
+<div class="sub">MAS 模式 · 2026-11-01 · 依 docs/threat-model/scored.json 計算</div>
+<div class="tiles"><div class="tile"><div class="num">12</div><div class="tl">威脅紀錄</div><div class="ts">其中高風險（Critical／High）5 筆</div></div><div class="tile"><div class="num">0</div><div class="tl">處置後仍為 Critical／High</div><div class="ts">最高剩 Medium（2 筆）</div></div><div class="tile"><div class="num">5</div><div class="tl">已實作控制</div><div class="ts">其餘 7 筆為規劃中</div></div></div>
+<div class="card"><h2>處置後有效風險（12 筆）</h2><div class="stack"><span class="seg" style="flex:2;background:var(--warning)"></span><span class="seg" style="flex:5;background:var(--neutral)"></span><span class="seg" style="flex:5;background:var(--good)"></span></div><span class="lg"><i style="background:var(--warning)"></i>▲ Medium <b>2</b></span><span class="lg"><i style="background:var(--neutral)"></i>● Low <b>5</b></span><span class="lg"><i style="background:var(--good)"></i>✓ 已緩解 <b>5</b></span></div>
+<div class="grid2">
+<div class="card"><h2>STRIDE 分類</h2><div class="brow"><span class="blab">S 偽冒</span><span class="btrack"><span class="bar" style="width:33.3%"></span><span class="bval">1</span></span></div><div class="brow"><span class="blab">T 竄改</span><span class="btrack"><span class="bar" style="width:100.0%"></span><span class="bval">3</span></span></div><div class="brow"><span class="blab">R 否認</span><span class="btrack"><span class="bar" style="width:33.3%"></span><span class="bval">1</span></span></div><div class="brow"><span class="blab">I 資訊揭露</span><span class="btrack"><span class="bar" style="width:100.0%"></span><span class="bval">3</span></span></div><div class="brow"><span class="blab">D 阻斷服務</span><span class="btrack"><span class="bar" style="width:33.3%"></span><span class="bval">1</span></span></div><div class="brow"><span class="blab">E 權限提升</span><span class="btrack"><span class="bar" style="width:100.0%"></span><span class="bval">3</span></span></div></div>
+<div class="card"><h2>MAESTRO 層</h2><div class="brow"><span class="blab">L1</span><span class="btrack"><span class="bval muted">0 · 不適用（已宣告）</span></span></div><div class="brow"><span class="blab">L2</span><span class="btrack"><span class="bval muted">0 · 不適用（已宣告）</span></span></div><div class="brow"><span class="blab">L3</span><span class="btrack"><span class="bar" style="width:75.0%"></span><span class="bval">3</span></span></div><div class="brow"><span class="blab">L4</span><span class="btrack"><span class="bar" style="width:100.0%"></span><span class="bval">4</span></span></div><div class="brow"><span class="blab">L5</span><span class="btrack"><span class="bar" style="width:50.0%"></span><span class="bval">2</span></span></div><div class="brow"><span class="blab">L6</span><span class="btrack"><span class="bar" style="width:25.0%"></span><span class="bval">1</span></span></div><div class="brow"><span class="blab">L7</span><span class="btrack"><span class="bar" style="width:50.0%"></span><span class="bval">2</span></span></div><div class="brow"><span class="blab">X</span><span class="btrack"><span class="bval muted">0</span></span></div></div>
+</div>
+<div class="card"><h2>高風險紀錄與處置結果</h2>
+<table><tr><th>紀錄</th><th>原始風險</th><th>威脅</th><th>處置後</th></tr><tr><td class="mono">CTARA-SSDLC-06</td><td><span class="pill"><i style="background:var(--critical)"></i>◆ Critical</span></td><td>以 allow 標記讓閘門忽略惡意程式</td><td><span class="pill"><i style="background:var(--good)"></i>✓ 已緩解 <span class="muted">(0)</span></span></td></tr><tr><td class="mono">CTARA-SSDLC-11</td><td><span class="pill"><i style="background:var(--critical)"></i>◆ Critical</span></td><td>以超大檔案、超長行或特殊檔案拖垮掃描</td><td><span class="pill"><i style="background:var(--good)"></i>✓ 已緩解 <span class="muted">(0)</span></span></td></tr><tr><td class="mono">CTARA-SSDLC-01B</td><td><span class="pill"><i style="background:var(--serious)"></i>▲ High</span></td><td>（敏感度）CTARA-SSDLC-01 於 bypass／acceptEdits 模式</td><td><span class="pill"><i style="background:var(--warning)"></i>▲ Medium <span class="muted">(1.5)</span></span></td></tr><tr><td class="mono">CTARA-SSDLC-02</td><td><span class="pill"><i style="background:var(--serious)"></i>▲ High</span></td><td>審查代理被注入後讀取憑證並寫入報告</td><td><span class="pill"><i style="background:var(--good)"></i>✓ 已緩解 <span class="muted">(0)</span></span></td></tr><tr><td class="mono">CTARA-SSDLC-10</td><td><span class="pill"><i style="background:var(--serious)"></i>▲ High</span></td><td>guard 拒絕無持久紀錄，事後無法追查</td><td><span class="pill"><i style="background:var(--good)"></i>✓ 已緩解 <span class="muted">(0)</span></span></td></tr></table></div>
+<div class="foot">工具的整體態勢分數為 CRITICAL（扣分 130），因為這份模型只記錄威脅，未登錄資產、入口與控制項（皆為 0），覆蓋率計為 0%；請以處置後有效風險解讀。完整內容見 report.md。</div>
+</html>
