@@ -43,7 +43,7 @@ Reported upstream: [google/elephant-goldfish-model#261](https://github.com/googl
 ## How it works
 ![ssdlc mind map](docs/ssdlc-mindmap.en.png)
 
-Interactive version: `docs/ssdlc-mindmap.en.html` (zoom, pan, edit; the toolbar text is Chinese); state file `docs/mindmaps/ssdlc.en.mindmap.json`. Chinese version: `docs/ssdlc-mindmap.png`.
+Interactive version: `docs/ssdlc-mindmap.en.html` (zoom, pan, edit); state file `docs/mindmaps/ssdlc.en.mindmap.json`. Chinese version: `docs/ssdlc-mindmap.png`.
 
 ## Skills
 | Command | Purpose |
