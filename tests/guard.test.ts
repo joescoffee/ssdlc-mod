@@ -166,3 +166,11 @@ test('allow-list: a broad or credential path in the prompt is not admitted as a 
   const r = await $.tool.call({ tool: 'Read', file_path: '/srv/data/x.txt', agentId } as any)
   expect(r.deny).toMatch(/outside this review's scope/)
 })
+
+test('allow-list: naming a subdirectory narrows the scope; the cwd is not added', async ($, on) => {
+  engine(on)
+  const { agentId } = await $.agent.spawn({ prompt: 'Your review scope is /work/acme/src', subagentType: 'ssdlc:security-reviewer' })
+  const call = async (tool: string, args: object) => (await $.tool.call({ tool, ...args, agentId } as any)).deny
+  expect(await call('Read', { file_path: '/work/acme/src/app.py' })).toBe(undefined)
+  expect(await call('Read', { file_path: '/work/acme/scripts/deploy.sh' })).toMatch(/outside this review's scope/)
+})

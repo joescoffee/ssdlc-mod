@@ -53,7 +53,7 @@ claude plugin install ssdlc --marketplace joescoffee/ssdlc-mod
 兩者 frontmatter 只有 `Read, Grep, Glob`；`hooks/register.ts` 守門 hook 再加三層縱深防禦（OWASP ASI02／ASI03、LLM02:2026）：
 - 審查代理呼叫 Read/Grep/Glob 與回報用的 `SubagentHandback` 以外的工具，一律拒絕；
 - 不得讀取憑證儲存處（`~/.ssh`、`~/.aws`、`.env*`、金鑰檔、`~/.claude/.credentials.json`、`/proc` 等），含 Grep/Glob 的 glob 參數；
-- **白名單**：每個審查員只能讀它的工作目錄、本 plugin 目錄，以及派它出去的 prompt 中明確寫出的絕對路徑（根目錄、家目錄、憑證位置不會被收進白名單）；
+- **白名單**：每個審查員只能讀派它出去的 prompt 中明確寫出的絕對路徑（沒寫時改用工作目錄）與本 plugin 目錄；根目錄、家目錄、憑證位置不會被收進白名單；
 - 先以 `$.fs.stat` 解析 symlink 實際落點再判斷，repo 內指向憑證的連結也會被擋；
 - **tripwire**：審查代理嘗試讀憑證或使用禁用工具＝提示注入跡象，警報會附在主 session 的下一個工具結果，技能據此判 BLOCK；`mcp__ssdlc__guard_log` 可查完整紀錄與本機計量。
 
@@ -90,6 +90,6 @@ claude plugin install ssdlc --marketplace joescoffee/ssdlc-mod
 ## Tests
 ```
 python3 -I -m unittest discover -s tests -v   # 53 tests: planted defects for every rule, safe counterparts, review regressions
-claude plugin test .                           # 25 hook tests (guard, allow-list, review mode, tripwire, metrics)
+claude plugin test .                           # 26 hook tests (guard, allow-list, review mode, tripwire, metrics)
 ```
 `tests/fixtures/` 內是**刻意植入漏洞**的範例檔，請勿匯入或執行。

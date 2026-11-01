@@ -350,7 +350,7 @@ HIGH     ai.mcp-inline-secret   .mcp.json:0  server 'issues': ISSUES_API_TOKEN=t
 | 審查員想用 Bash、Write、WebFetch 等非讀取工具 | 拒絕 | tripwire |
 | 讀取憑證位置：`~/.ssh`、`~/.aws`、`.env*`（範本除外）、金鑰檔、`~/.claude/.credentials.json`、`/proc`、k8s token、shell history 等（不分大小寫，連 symlink 指向也檢查） | 拒絕 | tripwire |
 | 從 `/`、家目錄、`/etc` 等位置遞迴搜尋 | 拒絕，請改傳 repo 路徑 | warn |
-| 讀取審查範圍以外的檔案。範圍＝工作目錄、ssdlc 外掛目錄、派遣 prompt 中寫出的絕對路徑 | 拒絕，請在 prompt 中寫出該路徑 | warn |
+| 讀取審查範圍以外的檔案。範圍＝派遣 prompt 中寫出的絕對路徑（沒寫時為工作目錄）＋ ssdlc 外掛目錄（檢查清單所在） | 拒絕，請在 prompt 中寫出該路徑 | warn |
 
 每次拒絕都會跳出提示；tripwire 也會顯示在狀態列，並在主對話的下一個工具結果附上警報。
 
@@ -429,7 +429,7 @@ docs/             手冊、審查報告、威脅模型、策略、心智圖
 
 ```bash
 python3 -I -m unittest discover -s tests   # 53 個：每條規則的植入缺陷與安全對照、審查回歸測試
-claude plugin test .                       # 25 個：守門、白名單、審查模式、tripwire、計量
+claude plugin test .                       # 26 個：守門、白名單、審查模式、tripwire、計量
 claude plugin validate .                   # 外掛結構檢查
 ```
 

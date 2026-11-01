@@ -91,22 +91,25 @@ export const within = (p: string, root: string): boolean => {
 }
 
 /**
- * The reviewer's allow-list (bounds blast radius, unlike the deny-list): the working
- * directory, this plugin's own folder (its checklists), and the paths the delegating prompt
- * names. A named path that is a filesystem root, a home or system directory, or a credential
+ * The reviewer's allow-list (bounds blast radius, unlike the deny-list): the paths the
+ * delegating prompt names — or the working directory when it names none — plus this plugin's
+ * own folder (its checklists). A named path that is a filesystem root, a home or system directory, or a credential
  * store is not admitted — it would make the allow-list meaningless.
  */
 export async function scopeFor($: EngineInterface, prompt: string, cwd: string | undefined): Promise<string[]> {
   const resolve = async (p: string) => (await $.fs.stat(p, { resolve: true }).catch(() => undefined))?.realPath
-  const roots = new Set<string>()
-  for (const p of [cwd ?? '.', $.plugin.root]) {
-    const real = await resolve(p)
-    if (real !== undefined) roots.add(normalize(real))
-  }
+  // Paths the delegating prompt names define the scope; the working directory is the
+  // fallback only when it names none (a named subdirectory must not widen to the whole cwd).
+  const named: string[] = []
   for (const p of pathsInPrompt(prompt)) {
     const real = normalize((await resolve(p)) ?? p)
     if (BROAD_ROOT.test(real) || SENSITIVE_PATH.test(real)) continue
-    roots.add(real)
+    named.push(real)
+  }
+  const roots = new Set<string>(named)
+  for (const p of named.length > 0 ? [$.plugin.root] : [cwd ?? '.', $.plugin.root]) {
+    const real = await resolve(p)
+    if (real !== undefined) roots.add(normalize(real))
   }
   return [...roots]
 }
