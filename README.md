@@ -21,9 +21,9 @@ In a conversation: `/plugin install ssdlc --marketplace joescoffee/ssdlc-mod`.
 📘 **New here? Start with the [Beginner's Guide](docs/manual/README.en.md)**: installation, a five-minute quick start, step-by-step use of every skill, the full procedure for reviewing an untrusted repository, the scanner CLI and CI, and troubleshooting.
 
 ## Demo
-![ssdlc live demo (v0.5.0)](docs/demo.png)
+![ssdlc live demo (v0.5.0)](docs/demo.en.png)
 
-Panels ①–③ are real output: the scanner ran with `--json` and the result is shown as a table; ② is a live verification in the Claude app (2026-11-01).
+Panels ①–③ are real output: the scanner ran with `--json` and the result is shown as a table; ② is a live verification in the Claude app (2026-11-01), whose interface was in Chinese, so the labels and the user's messages are translated. The original Chinese screenshot is `docs/demo.png`.
 
 ## Case study: reviewing EGM itself
 `/ssdlc:safe-bootstrap` reviewed upstream [google/elephant-goldfish-model](https://github.com/google/elephant-goldfish-model) @ `403d888`: Elephant (design threat model) and Goldfish (zero-context code review) ran in parallel, then were merged and cross-checked.
