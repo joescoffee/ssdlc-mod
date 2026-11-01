@@ -4,6 +4,8 @@
 
 # ssdlc — Secure SDLC mod for Claude Code
 
+[![Release](https://img.shields.io/github/v/release/joescoffee/ssdlc-mod?sort=semver)](https://github.com/joescoffee/ssdlc-mod/releases/latest)
+
 Security skills and truly read-only reviewer agents for Claude Code.
 
 ssdlc brings the secure software development lifecycle into Claude Code: security review, a pre-PR gate, a vulnerability-fix workflow, and **a truly read-only variant of the Elephant-Goldfish Model (EGM) review**. Reviewers have only Read/Grep/Glob (tool limits enforced by frontmatter and a hook); the hook also blocks credential paths and recursive searches from the filesystem root or home directory. "Read only inside the repo, never open out-of-repo links" is a prompt-level rule. No workflow ever executes the reviewed repository's code.
@@ -13,6 +15,8 @@ ssdlc brings the secure software development lifecycle into Claude Code: securit
 claude plugin install ssdlc --marketplace joescoffee/ssdlc-mod
 ```
 In a conversation: `/plugin install ssdlc --marketplace joescoffee/ssdlc-mod`.
+
+📦 **[Latest release](https://github.com/joescoffee/ssdlc-mod/releases/latest)** — release notes and earlier versions on the [Releases page](https://github.com/joescoffee/ssdlc-mod/releases).
 
 📘 **New here? Start with the [Beginner's Guide](docs/manual/README.en.md)**: installation, a five-minute quick start, step-by-step use of every skill, the full procedure for reviewing an untrusted repository, the scanner CLI and CI, and troubleshooting.
 

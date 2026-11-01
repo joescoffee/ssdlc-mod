@@ -4,6 +4,8 @@
 
 # ssdlc — Claude Code 的安全軟體開發生命週期外掛
 
+[![Release](https://img.shields.io/github/v/release/joescoffee/ssdlc-mod?sort=semver)](https://github.com/joescoffee/ssdlc-mod/releases/latest)
+
 為 Claude Code 提供安全技能與真正唯讀的審查代理。
 
 ssdlc 把安全軟體開發生命週期（SSDLC）帶進 Claude Code：安全審查、PR 前閘門、漏洞修復流程，以及 **Elephant-Goldfish Model（EGM）審查的真正唯讀版本**。審查員只有 Read/Grep/Glob（工具限制由 frontmatter 與 hook 強制），hook 另擋憑證路徑與從根目錄、家目錄的遞迴搜尋；「只讀 repo 內、不開 repo 外連結」則是提示層約束。所有流程都不執行被審 repo 的程式碼。
@@ -13,6 +15,8 @@ ssdlc 把安全軟體開發生命週期（SSDLC）帶進 Claude Code：安全審
 claude plugin install ssdlc --marketplace joescoffee/ssdlc-mod
 ```
 對話中：`/plugin install ssdlc --marketplace joescoffee/ssdlc-mod`。
+
+📦 **[最新版本](https://github.com/joescoffee/ssdlc-mod/releases/latest)**；發布說明與舊版請見 [Releases 頁面](https://github.com/joescoffee/ssdlc-mod/releases)。
 
 📘 **新手請從 [新手操作手冊](docs/manual/README.md) 開始**：安裝、五分鐘上手、六個技能逐步教學、審查不受信任 repo 的完整流程、掃描器 CLI 與 CI、疑難排解。
 
