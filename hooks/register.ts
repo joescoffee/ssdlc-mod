@@ -159,7 +159,8 @@ export const register: Register = on => {
     const m = REVIEW_MODE_PROMPT.exec(e.text.trim())
     if (m === null || e.isMeta) return next(e)
     // Answered here and shown to the person; the model never receives it.
-    return { drop: await reviewModeCommand($, (m[1] ?? 'status').toLowerCase(), e.origin) }
+    // The app titles every dropped prompt "blocked by a hook"; the prefix says this one was answered.
+    return { drop: `ssdlc ✓ ${await reviewModeCommand($, (m[1] ?? 'status').toLowerCase(), e.origin)}` }
   })
 
   on('tool.call', { tool: 'mcp__ssdlc__guard_log' }, async $ => {

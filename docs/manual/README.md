@@ -122,7 +122,7 @@ claude plugin details ssdlc
 ssdlc review-mode status
 ```
 
-回覆 `Review mode is OFF; guard events this session: 0 …` 即表示 hook 正常運作。
+回覆 `ssdlc ✓ Review mode is OFF; guard events this session: 0 …` 即表示 hook 正常運作（app 中會顯示在「Hook 已封鎖您的提示」框內，屬正常）。
 
 ### 4.3 更新、停用、移除
 
@@ -265,6 +265,8 @@ ssdlc review-mode off
 ```
 
 > 只有你親自輸入才能關閉；Claude、其他外掛或背景通知送出的同樣文字都會被拒絕。這則訊息由守門程式直接回覆，不會送給模型。
+>
+> 在 Claude app／網頁版中，回覆會出現在標題為「**Hook 已封鎖您的提示**」的框裡，內容以 `ssdlc ✓` 開頭——這是正常的：守門程式攔下了這則訊息（所以不會送給模型），框裡的文字就是它的回覆。
 
 ---
 
