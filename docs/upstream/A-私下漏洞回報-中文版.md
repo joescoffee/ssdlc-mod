@@ -15,7 +15,9 @@
 
 ## 先前曝光（揭露說明）
 
-這些發現的報告（我的 repo `joescoffee/ssdlc-mod` 中的 `docs/reviews/egm-403d888.md`）曾不慎公開約 15 分鐘：從 2026-11-01 05:06 UTC 起，到約 05:19 UTC 將 repo 改為私有為止。我不知道有誰存取過，但在這段期間內可能已被 clone 或快取。在修正版發布或你們同意揭露之前，該 repo 會維持私有。
+**這些發現已經公開。** 審查報告（`docs/reviews/egm-403d888.md`）、這份回報與後續的 issue 草稿，都放在我的 repo `joescoffee/ssdlc-mod`（https://github.com/joescoffee/ssdlc-mod），該 repo 已於 2026-11-01 由我公開。在此之前，報告也曾不慎公開約 15 分鐘（2026-11-01 05:06–05:19 UTC），隨後改為私有。
+
+因此這份回報是「事先通知」，不是要求保密期的私下回報：請在安排修正時程時，把以下五項視為已公開的問題。你們發布修正或公告後，我很樂意在 repo 中加註連結。
 
 ## 1. egm-bootstrap 會執行目標 repo 設定的 formatter（程式碼執行）
 
