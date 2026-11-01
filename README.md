@@ -55,7 +55,8 @@ claude plugin install ssdlc --marketplace joescoffee/ssdlc-mod
 - 不得讀取憑證儲存處（`~/.ssh`、`~/.aws`、`.env*`、金鑰檔、`~/.claude/.credentials.json`、`/proc` 等），含 Grep/Glob 的 glob 參數；
 - **白名單**：每個審查員只能讀派它出去的 prompt 中明確寫出的絕對路徑（沒寫時改用工作目錄）與本 plugin 目錄；根目錄、家目錄、憑證位置不會被收進白名單；
 - 先以 `$.fs.stat` 解析 symlink 實際落點再判斷，repo 內指向憑證的連結也會被擋；
-- **tripwire**：審查代理嘗試讀憑證或使用禁用工具＝提示注入跡象，警報會附在主 session 的下一個工具結果，技能據此判 BLOCK；`mcp__ssdlc__guard_log` 可查完整紀錄與本機計量。
+- **tripwire**：審查代理嘗試讀憑證或使用禁用工具＝提示注入跡象，警報會附在主 session 的下一個工具結果，技能據此判 BLOCK；
+- **存活檢查與紀錄**：`mcp__ssdlc__guard_log` 回報 guard 版本、載入時間與規則自我檢查；每個技能派審查員前都先呼叫它，guard 不在或自我檢查失敗就停止（INCOMPLETE）。拒絕紀錄跨 session 保存在本機（最多 500 筆）。
 
 ## Scanner
 `scripts/gate_scan.py` 只用標準函式庫、不連網、不跟隨 symlink。每筆發現附 `refs`（CWE、`LLMnn:2026`、`ASInn`）。
@@ -90,6 +91,6 @@ claude plugin install ssdlc --marketplace joescoffee/ssdlc-mod
 ## Tests
 ```
 python3 -I -m unittest discover -s tests -v   # 53 tests: planted defects for every rule, safe counterparts, review regressions
-claude plugin test .                           # 26 hook tests (guard, allow-list, review mode, tripwire, metrics)
+claude plugin test .                           # 28 hook tests (guard, allow-list, review mode, tripwire, liveness, history)
 ```
 `tests/fixtures/` 內是**刻意植入漏洞**的範例檔，請勿匯入或執行。

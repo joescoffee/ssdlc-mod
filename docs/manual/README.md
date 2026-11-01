@@ -1,6 +1,6 @@
 # ssdlc 新手操作手冊
 
-> 適用版本：**ssdlc v0.4.0**（2026-11-01）。本手冊的每一條指令都在該版本實際執行過；截圖為實機輸出。
+> 適用版本：**ssdlc v0.5.0**（2026-11-01）。本手冊的每一條指令都在該版本實際執行過；截圖為實機輸出。
 > 讀完前三章（約 15 分鐘）即可開始使用；其餘章節在需要時查閱。
 
 ## 目錄
@@ -373,7 +373,15 @@ HIGH     ai.mcp-inline-secret   .mcp.json:0  server 'issues': ISSUES_API_TOKEN=t
 | 其他外掛的 MCP 工具 | 關閉（`mcp__ssdlc__guard_log` 除外） |
 | Read、Grep、Glob | 正常 |
 
-### 10.3 本機計量
+### 10.3 guard 存活檢查與歷史紀錄
+
+hook 若因 Claude Code 更新而沒有載入，它無法自己報錯。所以 ssdlc 反過來做：每個技能在派審查員**之前**都會呼叫 `guard_log` 工具確認 guard 還在。
+
+- 工具不存在、出錯，或 `selfTest.pass` 為 false（規則本身壞掉）→ 技能停止並回報 **INCOMPLETE — ssdlc guard not active**，不會在沒有保護的情況下派審查員。
+- 你也可以隨時請 Claude「呼叫 guard_log」，回覆中的 `guard` 區塊會列出版本、載入時間與自我檢查結果。
+- 每次拒絕都會寫進本機的歷史紀錄（跨 session、最多 500 筆），`guard_log` 的 `history` 區塊顯示總數與最近 20 筆。
+
+### 10.4 本機計量
 
 `ssdlc review-mode status` 會顯示自首次使用以來的掃描次數、審查員派出次數、tripwire 與 warn 次數。這些數字只存在你的電腦（Claude Code 的外掛儲存區），不會傳到任何地方，用途是讓你知道工具被使用的程度與警報的頻率。
 
@@ -429,7 +437,7 @@ docs/             手冊、審查報告、威脅模型、策略、心智圖
 
 ```bash
 python3 -I -m unittest discover -s tests   # 53 個：每條規則的植入缺陷與安全對照、審查回歸測試
-claude plugin test .                       # 26 個：守門、白名單、審查模式、tripwire、計量
+claude plugin test .                       # 28 個：守門、白名單、審查模式、tripwire、存活檢查、歷史
 claude plugin validate .                   # 外掛結構檢查
 ```
 

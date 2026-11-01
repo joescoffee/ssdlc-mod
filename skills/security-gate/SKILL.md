@@ -26,7 +26,7 @@ gate it (OWASP ASI05); run git only on a repository you cloned yourself, with th
    - Run `npm audit` from a scratch directory that contains only the lockfile and `package.json`, with `--registry=https://registry.npmjs.org/`.
    - Record each tool's `--version`. A missing tool or unparseable manifest is a gap, not a pass.
 4. **Diff review**: read the diff hunks for the 10 areas of `/ssdlc:security-review`, concentrating on new entry points, authz changes and new sinks. If the diff touches prompts, model calls, tools, MCP config, agent settings, RAG or memory, also apply `${CLAUDE_PLUGIN_ROOT}/references/ai-risk-checklist.md` and tag findings `LLMnn:2026` / `ASInn`. If it touches `CLAUDE.md`, `AGENTS.md`, `.claude/`, `.mcp.json` or `.vscode/`, say so prominently: those files configure the next agent that opens the repository.
-5. **Verdict** (when reviewers were used, check `mcp__ssdlc__guard_log`: any tripwire is a BLOCK, `ai.injection-attempt-observed`)
+5. **Verdict** (if you spawn reviewers, first run the guard preflight: `mcp__ssdlc__guard_log` must answer with `guard.selfTest.pass: true`, else `INCOMPLETE`; afterwards any tripwire it lists is a BLOCK, `ai.injection-attempt-observed`)
    - `BLOCK` — any secret; any High/Critical finding that is real on inspection; any High/Critical CVE in a changed dependency; `ai.agent-approval-bypass`, `ai.agent-wildcard-allowlist` or `repo.git-config-exec` in committed config.
    - `WARN` — Medium items, new allow markers, changed audit-tool configuration; list them.
    - `INCOMPLETE` — the scanner exited 3 or listed skipped changed files, a changed manifest could not be audited, or a step could not run. Never report `PASS` in this state.

@@ -1,7 +1,7 @@
 import { expect, test } from 'claude-code/testing'
 
 import { bashVerdict, isPersonOrigin, reviewModeVerdict } from '../hooks/review-mode'
-import { alertLevel, alertMessage, REVIEW_MODE_PROMPT } from '../hooks/register'
+import { alertLevel, alertMessage, REVIEW_MODE_PROMPT, selfTest } from '../hooks/register'
 
 const GIT = 'env GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null git -c core.fsmonitor=false -c core.hooksPath=/dev/null -c core.attributesFile=/dev/null -c diff.external= -c core.pager=cat'
 
@@ -65,6 +65,7 @@ const engine = (on: any) => {
   on('tool.register', () => ({ value: { tool: 'mcp__ssdlc__guard_log' } }))
   on('agent.list', () => ({ value: [{ id: 'r1', type: 'ssdlc:security-reviewer', description: '', status: 'running' }] }))
   on('fs.stat', (_: any, e: any) => ({ value: { kind: 'file', size: 1, mtimeMs: 0, isLink: false, realPath: e.path } }))
+  on('fs.read', () => ({ value: '{"version": "9.9.9"}' }))
   on('tool.call', () => ({ result: { ok: true } }))
   on('command.run', () => ({ text: 'engine' }))
   on('session.start', (_: any, e: any) => ({ cwd: e.cwd }))
@@ -137,4 +138,21 @@ test('a typed message switches review mode; only a person can switch it off', as
   expect(off.drop).toMatch(/OFF/)
   const normal = await $.prompt.submit({ text: 'review this repo please', origin: { kind: 'bridge' }, wait: false } as any)
   expect(normal.drop).toBe(undefined)
+})
+
+test('guard self-test passes on the shipped rules', () => {
+  const r = selfTest()
+  expect(r.failures).toEqual([])
+  expect(r.pass).toBe(true)
+})
+
+test('guard_log proves the guard is live and keeps a cross-session history', async ($, on) => {
+  engine(on)
+  await $.tool.call({ tool: 'Read', file_path: '/home/u/.aws/credentials', agentId: 'r1' } as any)
+  const out = JSON.parse((await $.tool.call({ tool: 'mcp__ssdlc__guard_log' } as any)).result as any)
+  expect(out.guard.active).toBe(true)
+  expect(out.guard.version).toBe('9.9.9')
+  expect(out.guard.selfTest.pass).toBe(true)
+  expect(out.history.total).toBe(1)
+  expect(out.history.recent[0].level).toBe('tripwire')
 })

@@ -30,7 +30,7 @@
 | 平行數無上限 | T13、F11 | Low | ✅ security-review 上限 4 個審查員 |
 | TOCTOU、hard link | SR-16 | Low | ⚠️ 未修：需 OS 層 sandbox，列入已知限制 |
 | marketplace 未鎖版本、無完整性檢查 | T17、F9 | Low | ⚠️ 部分：以 git tag `v0.2.1` 發布，手冊說明如何鎖定版本 |
-| denial 無持久 log | T19 | Low | ⚠️ 未修：目前只有 toast，列入路線圖 |
-| host API 漂移使 guard 靜默失效 | T18、SR-22 | Info | ⚠️ 未修：列入路線圖（啟用訊號） |
+| denial 無持久 log | T19 | Low | ✅（v0.5.0）session 內存於 `$.state`、跨 session 歷史存於 `$.store`（500 筆）、`guard_log` 可查 |
+| host API 漂移使 guard 靜默失效 | T18、SR-22 | Info | ✅（v0.5.0）存活檢查：技能派審查員前呼叫 `guard_log`，工具缺席或規則自我檢查失敗即 fail-closed（INCOMPLETE） |
 
 測試：Python 單元測試 40 → 53、guard hook 測試 9 → 13，全數通過。

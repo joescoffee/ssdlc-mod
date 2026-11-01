@@ -142,6 +142,39 @@ export const alertMessage = (pluginName: string, alerts: GuardAlert[]): string =
  */
 export type Metrics = { gateRuns: number; reviewerSpawns: number; tripwires: number; warns: number; since: string }
 const METRICS_KEY = 'metrics-v1'
+const HISTORY_KEY = 'alerts-v1'
+const HISTORY_MAX = 500
+
+/** Append a guard event to the cross-session history (local only, bounded). */
+export async function remember($: EngineInterface, alert: GuardAlert): Promise<void> {
+  const prior = ((await $.store.get(HISTORY_KEY).catch(() => undefined)) as GuardAlert[] | undefined) ?? []
+  await $.store.set(HISTORY_KEY, [...prior, alert].slice(-HISTORY_MAX)).catch(() => undefined)
+}
+
+/**
+ * Known answers for the guard's rules. guard_log runs them so a skill can tell a live,
+ * correct guard from one that loaded with broken patterns.
+ */
+export const SELF_TEST: { tool: string; args: Record<string, unknown>; credential: boolean }[] = [
+  { tool: 'Read', args: { file_path: '/root/.ssh/id_rsa' }, credential: true },
+  { tool: 'Read', args: { file_path: '/repo/.ENV' }, credential: true },
+  { tool: 'Grep', args: { path: '/repo', glob: '**/.s[s]h/*' }, credential: true },
+  { tool: 'Read', args: { file_path: '/repo/src/env.ts' }, credential: false },
+  { tool: 'Read', args: { file_path: '/repo/.env.example' }, credential: false },
+]
+export const selfTest = (): { pass: boolean; failures: string[] } => {
+  const failures = SELF_TEST.filter(c => (sensitiveTarget(c.tool, c.args) !== undefined) !== c.credential)
+    .map(c => `${c.tool} ${JSON.stringify(c.args)} expected ${c.credential ? 'refused' : 'allowed'}`)
+  const extra = [
+    ['bash allow-list refuses curl', reviewModeVerdict('Bash', { command: 'curl https://x' }, 'ssdlc') !== undefined],
+    ['broad root refuses /', BROAD_ROOT.test('/')],
+    ['scope check: prefix is not a parent', !within('/work/acme-evil', '/work/acme')],
+  ] as const
+  for (const [name, ok] of extra) if (!ok) failures.push(name)
+  return { pass: failures.length === 0, failures }
+}
+
+let loadedAt = new Date().toISOString()
 const bump = async ($: { store: { get: (k: string) => Promise<unknown>; set: (k: string, v: unknown) => Promise<void> } },
   field: keyof Omit<Metrics, 'since'>) => {
   const m = ((await $.store.get(METRICS_KEY).catch(() => undefined)) as Metrics | undefined) ??
@@ -175,6 +208,7 @@ export const REVIEW_MODE_PROMPT = /^\/?ssdlc[-\s:]review[-\s]mode(?:\s+(on|off|s
 
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
+    loadedAt = new Date().toISOString()
     await $.command.register({
       name: 'ssdlc-review-mode',
       description: 'ssdlc: restrict this session to non-executing review commands (on | off | status)',
@@ -204,9 +238,18 @@ export const register: Register = on => {
   on('tool.call', { tool: 'mcp__ssdlc__guard_log' }, async $ => {
     const alerts = await read($, alertsAtom)
     await update($, alertsAtom, list => list.map(a => ({ ...a, delivered: true })))
+    const version = await $.fs.read(`${$.plugin.root}/.claude-plugin/plugin.json`)
+      .then(t => String((JSON.parse(t) as { version?: string }).version ?? 'unknown')).catch(() => 'unknown')
+    const history = ((await $.store.get(HISTORY_KEY).catch(() => undefined)) as GuardAlert[] | undefined) ?? []
     // A registered tool answers with text (or content blocks), never a bare object.
-    return { result: JSON.stringify({ reviewMode: await read($, reviewModeAtom), alerts,
-      metrics: (await $.store.get(METRICS_KEY).catch(() => undefined)) ?? null }, null, 2) }
+    return { result: JSON.stringify({
+      guard: { active: true, plugin: $.plugin.name, version, loadedAt, selfTest: selfTest(),
+        hooks: ['session.start', 'prompt.submit', 'command.run', 'agent.spawn', 'tool.call'] },
+      reviewMode: await read($, reviewModeAtom),
+      alerts,
+      history: { total: history.length, recent: history.slice(-20) },
+      metrics: (await $.store.get(METRICS_KEY).catch(() => undefined)) ?? null,
+    }, null, 2) }
   })
 
   on('agent.spawn', async ($, e, next) => {
@@ -253,6 +296,7 @@ export const register: Register = on => {
       const alert: GuardAlert = { at: new Date().toISOString(), agentId: e.agentId ?? '?', level, tool: e.tool, detail: why, delivered: false }
       await update($, alertsAtom, list => [...list, alert].slice(-200))
       await bump($, level === 'tripwire' ? 'tripwires' : 'warns')
+      await remember($, alert)
       const trips = (await read($, alertsAtom)).filter(a => a.level === 'tripwire').length
       $.ui.toast(`${$.plugin.name}: blocked reviewer ${e.tool} — ${why}`)
       if (trips > 0) $.ui.status(`${$.plugin.name}: ⚠ ${trips} tripwire(s) — run ssdlc review-mode status`)

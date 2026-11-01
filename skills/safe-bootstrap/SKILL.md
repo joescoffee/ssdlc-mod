@@ -26,6 +26,8 @@ review-copy commands run; no network; writes only to report files; only ssdlc re
 Write commands fully expanded (no `$VAR`), since variables and pipes are refused. Only the user can switch it off.
 
 ## Procedure
+**Guard preflight (fail closed).** Before spawning any reviewer, call `mcp__ssdlc__guard_log`. If the tool is missing or errors, or its `guard.selfTest.pass` is false, the read-only guard is not protecting this session (OWASP ASI02/ASI03): do not spawn reviewers; report `INCOMPLETE — ssdlc guard not active` with the reason.
+
 1. **Pin the scope**: repo root, the diff or paths under review, and the design doc(s) if any. Write them into the prompt of each reviewer. Name every path under review as an **absolute path** in each reviewer's prompt: the guard limits a reviewer to its working directory, this plugin's folder and the paths its prompt names (a filesystem root or home directory is never admitted). If the `ssdlc:*-reviewer` types are unavailable, stop — never substitute a general-purpose agent.
 2. **Elephant pass** — spawn `ssdlc:design-reviewer` with the design doc(s) plus the full history/context you have (why the change exists, prior decisions).
 3. **Goldfish pass** — in parallel, spawn `ssdlc:security-reviewer` with *only* the diff/paths and no background, so it judges the code on its face.
