@@ -96,10 +96,10 @@
       "ai_threat_category": "ASI03",
       "ai_component": "agent-tool",
       "cwe": "CWE-200",
-      "mitigation_status": "partial",
-      "current_controls": "frontmatter 只給 Read/Grep/Glob；guard denylist（不分大小寫、symlink 解析）、拒絕從根目錄／家目錄遞迴搜尋；憑證嘗試列為 tripwire，警報傳到主 session",
-      "recommended_controls": "repo 根目錄 allowlist；憑證存取嘗試列為 tripwire 判 BLOCK",
-      "processing_status": "進行中",
+      "mitigation_status": "full",
+      "current_controls": "frontmatter 只給 Read/Grep/Glob；guard denylist（不分大小寫、symlink 解析）、拒絕從根目錄／家目錄遞迴搜尋；憑證嘗試列為 tripwire，警報傳到主 session；v0.4.0 白名單：審查員只能讀工作目錄、plugin 目錄與派遣 prompt 指名的路徑（根目錄、家目錄、憑證位置不收）",
+      "recommended_controls": "OS 層沙箱（解決 TOCTOU 與 hard link）",
+      "processing_status": "已完成",
       "threat_actors": [
         "惡意 repo／PR 作者"
       ],
@@ -114,9 +114,10 @@
         "AU"
       ],
       "prevention_controls": [
-        "frontmatter 工具限制",
-        "憑證 denylist（不分大小寫、symlink 解析）",
-        "拒絕根目錄／家目錄遞迴搜尋"
+        "白名單範圍",
+        "憑證黑名單（第二層）",
+        "拒絕大範圍遞迴搜尋",
+        "frontmatter 工具限制"
       ],
       "detection_controls": [
         "tripwire 警報",
@@ -132,6 +133,13 @@
           "result": "pass",
           "date": "2026-11-01",
           "evidence_ref": "tests/guard.test.ts: review fixes: case, spellings, extra stores, broad searches, cwd"
+        },
+        {
+          "stage": "pre-release",
+          "method": "unit-test",
+          "result": "pass",
+          "date": "2026-11-01",
+          "evidence_ref": "tests/guard.test.ts: allow-list tests"
         }
       ]
     },

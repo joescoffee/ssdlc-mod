@@ -7,7 +7,7 @@
 | git 指令會執行受審 repo 的 `.git/config`（fsmonitor、filter、diff.external…），且各技能不一致 | SR-2/3/11、T8 | High | ✅ 新增 `references/untrusted-repo.md` 單一規則：只在自己 clone 的 repo 跑 git＋完整旗標；壓縮檔／共享資料夾帶來的 `.git` 不跑 git；所有技能引用 |
 | security-review 的依賴稽核用 plain `pip-audit` | SR-12 | High | ✅ 改引用只解析的指令 |
 | 大小寫、`//`、`/./` 繞過 guard | SR-4、SR-13 | High | ✅ 不分大小寫、路徑正規化 |
-| Grep 從上層目錄遞迴讀進憑證 | SR-1、T5 | High | ⚠️ 部分：拒絕從根目錄、家目錄、系統目錄、`~/.config` 遞迴搜尋；無 path 時以 cwd 判斷。repo 根目錄 allowlist 列入路線圖 |
+| Grep 從上層目錄遞迴讀進憑證 | SR-1、T5 | High | ✅（v0.4.0）白名單：工作目錄、plugin 目錄、派遣 prompt 指名的路徑；拒絕根目錄、家目錄、系統目錄遞迴搜尋；黑名單保留為第二層 |
 | 主 session 三項全中（Rule of Two） | T1、T21、T22 | High | ⚠️ 未修：列入已知限制；技能新增 fail-closed（無 ssdlc 審查代理就停止）、禁止以弱化檢查求通過 |
 | 檔名經 shell 造成命令注入 | T2 | High | ✅ 掃描器 `--files-from`（NUL 分隔）、支援 `--`；gate 改用 `git diff -z` 寫入清單檔 |
 | denylist 不完整（k8s token、.envrc、.claude.json、history…） | SR-5、T5b | Medium | ✅ 擴充 |

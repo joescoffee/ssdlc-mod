@@ -53,6 +53,7 @@ claude plugin install ssdlc --marketplace joescoffee/ssdlc-mod
 兩者 frontmatter 只有 `Read, Grep, Glob`；`hooks/register.ts` 守門 hook 再加三層縱深防禦（OWASP ASI02／ASI03、LLM02:2026）：
 - 審查代理呼叫 Read/Grep/Glob 與回報用的 `SubagentHandback` 以外的工具，一律拒絕；
 - 不得讀取憑證儲存處（`~/.ssh`、`~/.aws`、`.env*`、金鑰檔、`~/.claude/.credentials.json`、`/proc` 等），含 Grep/Glob 的 glob 參數；
+- **白名單**：每個審查員只能讀它的工作目錄、本 plugin 目錄，以及派它出去的 prompt 中明確寫出的絕對路徑（根目錄、家目錄、憑證位置不會被收進白名單）；
 - 先以 `$.fs.stat` 解析 symlink 實際落點再判斷，repo 內指向憑證的連結也會被擋；
 - **tripwire**：審查代理嘗試讀憑證或使用禁用工具＝提示注入跡象，警報會附在主 session 的下一個工具結果，技能據此判 BLOCK；`mcp__ssdlc__guard_log` 可查完整紀錄與本機計量。
 
@@ -81,7 +82,7 @@ claude plugin install ssdlc --marketplace joescoffee/ssdlc-mod
 經 v0.2.0 自我審查（[`docs/reviews/ssdlc-0.2.0-self-review.md`](docs/reviews/ssdlc-0.2.0-self-review.md)）後仍未解決、如實揭露的項目：
 
 1. **主 session 的約束需要手動開啟**（T1）：`ssdlc review-mode on` 會在 code 中界定主 session；沒開啟時，只能靠流程與 Claude Code 的逐次核准。**審查不受信任的 repo 前請先開啟審查模式**。
-2. **審查代理的檔案限制是 denylist**（SR-1、T5）：已擋憑證路徑與從根目錄／家目錄的遞迴搜尋，但不是「只能讀 repo 內」的 allowlist。路線圖：repo 根目錄 allowlist。
+2. **審查員白名單由派遣 prompt 決定**（SR-1、T5，v0.4.0 起）：範圍是工作目錄、plugin 目錄與 prompt 中的絕對路徑；主 session 若被注入而把不該讀的目錄寫進 prompt，白名單會放行（憑證黑名單仍擋）。
 3. **TOCTOU 與 hard link**（SR-16）：guard 檢查與實際讀取之間有時間差；hard link 無法以 realpath 辨識。需 OS 層 sandbox。
 4. **未驗證的宿主行為**：Claude Code 的 Grep 是否搜尋隱藏檔、子目錄 `CLAUDE.md` 是否延遲載入，未實測。
 5. **掃描器是程式碼衛生檢查**，不是執行期的注入或 DLP 過濾器（OWASP 2026 明言 regex 擋不住編碼內容）。
@@ -89,6 +90,6 @@ claude plugin install ssdlc --marketplace joescoffee/ssdlc-mod
 ## Tests
 ```
 python3 -I -m unittest discover -s tests -v   # 53 tests: planted defects for every rule, safe counterparts, review regressions
-claude plugin test .                           # 21 hook tests (guard, review mode, tripwire, metrics)
+claude plugin test .                           # 25 hook tests (guard, allow-list, review mode, tripwire, metrics)
 ```
 `tests/fixtures/` 內是**刻意植入漏洞**的範例檔，請勿匯入或執行。

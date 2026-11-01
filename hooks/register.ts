@@ -76,6 +76,41 @@ const reviewers = new Set<string>()
 // Session state survives a module reload (review mode must not silently switch off).
 const reviewModeAtom = atom({ plugin: 'ssdlc', key: 'reviewMode' } as const, false)
 const alertsAtom = atom({ plugin: 'ssdlc', key: 'alerts' } as const, [] as GuardAlert[])
+const scopesAtom = atom({ plugin: 'ssdlc', key: 'reviewerScopes' } as const, {} as Record<string, string[]>)
+
+/** Absolute paths a delegating prompt names explicitly: they become the reviewer's scope. */
+export const pathsInPrompt = (prompt: string): string[] =>
+  [...prompt.matchAll(/(?:^|[\s`'"(\[])(\/[^\s`'"()<>\[\]]+)/g)]
+    .map(m => (m[1] ?? '').replace(/[.,;:]+$/, ''))
+    .filter(p => p.length > 1)
+
+/** True when `p` is `root` or lies beneath it. */
+export const within = (p: string, root: string): boolean => {
+  const r = root.endsWith('/') ? root.slice(0, -1) : root
+  return p === r || p.startsWith(`${r}/`)
+}
+
+/**
+ * The reviewer's allow-list (bounds blast radius, unlike the deny-list): the working
+ * directory, this plugin's own folder (its checklists), and the paths the delegating prompt
+ * names. A named path that is a filesystem root, a home or system directory, or a credential
+ * store is not admitted — it would make the allow-list meaningless.
+ */
+export async function scopeFor($: EngineInterface, prompt: string, cwd: string | undefined): Promise<string[]> {
+  const resolve = async (p: string) => (await $.fs.stat(p, { resolve: true }).catch(() => undefined))?.realPath
+  const roots = new Set<string>()
+  for (const p of [cwd ?? '.', $.plugin.root]) {
+    const real = await resolve(p)
+    if (real !== undefined) roots.add(normalize(real))
+  }
+  for (const p of pathsInPrompt(prompt)) {
+    const real = normalize((await resolve(p)) ?? p)
+    if (BROAD_ROOT.test(real) || SENSITIVE_PATH.test(real)) continue
+    roots.add(real)
+  }
+  return [...roots]
+}
+
 
 /**
  * Game-theoretic choice (docs/strategy): a refusal is a *tripwire* only where false
@@ -179,6 +214,9 @@ export const register: Register = on => {
     const started = await next(e)
     if (isReviewerType($.plugin.name, e.subagentType) && started.agentId !== undefined) {
       reviewers.add(started.agentId)
+      const id = started.agentId
+      const roots = await scopeFor($, e.prompt, e.cwd)
+      await update($, scopesAtom, all => ({ ...all, [id]: roots }))
       await bump($, 'reviewerSpawns')
     }
     return started
@@ -235,6 +273,14 @@ export const register: Register = on => {
       }
       if (searches && (BROAD_ROOT.test(normalize(p)) || BROAD_ROOT.test(where))) {
         return refuse('scope', `reviewers may not search ${where} recursively; pass the repository path instead.`)
+      }
+      // Allow-list: the path must land inside the reviewer's scope. A relative spelling that
+      // cannot be resolved stays inside the working directory unless it climbs out with "..".
+      const roots = (await read($, scopesAtom))[e.agentId] ?? (await scopeFor($, '', undefined))
+      const absolute = where.startsWith('/') || /^[a-z]:\//i.test(where)
+      const inside = absolute ? roots.some(r => within(where, r)) : !where.split('/').includes('..')
+      if (!inside) {
+        return refuse('scope', `${where} is outside this review's scope (${roots.join(', ')}). Name it in the reviewer's prompt if it belongs to the review.`)
       }
     }
     return next(e)

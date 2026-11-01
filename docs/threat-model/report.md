@@ -1,4 +1,4 @@
-# 威脅模型報告：ssdlc mod v0.3.0（MAS 模式，2026-11-01）
+# 威脅模型報告：ssdlc mod v0.4.0（MAS 模式，2026-11-01）
 
 > 版本：1.0 | 作者：— | 產生日期：2026-11-01
 
@@ -24,9 +24,9 @@
 
 | Critical | High | Medium | Low | Mitigated |
 |---|---|---|---|---|
-| 0 | 0 | 3 | 5 | 4 |
+| 0 | 0 | 2 | 5 | 5 |
 
-處置狀態：none 0、planned 8、implemented 4、verified 0
+處置狀態：none 0、planned 7、implemented 5、verified 0
 
 ## STRIDE 覆蓋度
 
@@ -165,10 +165,10 @@ ASI 已記錄：6/10。
 - MITRE ATT&CK：—
 - 威脅行為者：惡意 repo／PR 作者
 - MAESTRO：L3；代理因子：ID, AU
-- 現行控制：frontmatter 只給 Read/Grep/Glob；guard denylist（不分大小寫、symlink 解析）、拒絕從根目錄／家目錄遞迴搜尋；憑證嘗試列為 tripwire，警報傳到主 session
-- 建議控制：repo 根目錄 allowlist；憑證存取嘗試列為 tripwire 判 BLOCK
-- 處理狀態：進行中
-- 處置狀態 treatment_status：planned　有效風險：1.5（Medium）
+- 現行控制：frontmatter 只給 Read/Grep/Glob；guard denylist（不分大小寫、symlink 解析）、拒絕從根目錄／家目錄遞迴搜尋；憑證嘗試列為 tripwire，警報傳到主 session；v0.4.0 白名單：審查員只能讀工作目錄、plugin 目錄與派遣 prompt 指名的路徑（根目錄、家目錄、憑證位置不收）
+- 建議控制：OS 層沙箱（解決 TOCTOU 與 hard link）
+- 處理狀態：已完成
+- 處置狀態 treatment_status：implemented　有效風險：0.0（Mitigated）
 
 ## 建議的下一步行動
 
@@ -176,4 +176,4 @@ ASI 已記錄：6/10。
 2. 補充 MAESTRO 層／代理因子盲區分析：L1, L2
 
 ---
-*本報告由威脅建模技能自動產生，產生時間：2026-11-01T06:08:19.240685*
+*本報告由威脅建模技能自動產生，產生時間：2026-11-01T07:23:16.532866*

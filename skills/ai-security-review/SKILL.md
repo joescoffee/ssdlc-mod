@@ -39,7 +39,7 @@ For each agent/session apply **G-1 Rule of Two**: (A) untrusted input, (B) sensi
 (G-2); confirm authorization is decided in code (G-3).
 
 ## 4. Reviewers (read-only, in parallel)
-Spawn with absolute paths in the prompt (they cannot expand variables):
+Spawn with absolute paths in the prompt (they cannot expand variables). Name every path under review as an **absolute path** in each reviewer's prompt: the guard limits a reviewer to its working directory, this plugin's folder and the paths its prompt names (a filesystem root or home directory is never admitted).
 - **`ssdlc:security-reviewer`** — code pass: the inventory, scan output and
   `PLUGIN/references/ai-risk-checklist.md` §1–§2; one reviewer per component for large systems.
 - **`ssdlc:design-reviewer`** — design pass: architecture/design docs plus

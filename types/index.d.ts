@@ -17,6 +17,8 @@ declare module 'claude-code' {
       /** Main-session review mode: only exact, non-executing command forms are allowed. */
       reviewMode: boolean
       alerts: GuardAlert[]
+      /** Each reviewer's allowed roots (real paths), keyed by agent id. */
+      reviewerScopes: Record<string, string[]>
     }
   }
 }

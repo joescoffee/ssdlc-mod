@@ -18,7 +18,7 @@ const engine = (on: any, links: Record<string, string> = {}, cwd = '/repo') => {
 
 test('a reviewer agent cannot write or run commands', async ($, on) => {
   engine(on)
-  const { agentId } = await $.agent.spawn({ prompt: 'review', subagentType: 'ssdlc:security-reviewer' })
+  const { agentId } = await $.agent.spawn({ prompt: 'review /repo and /work/repo', subagentType: 'ssdlc:security-reviewer' })
   const bash = await $.tool.call({ tool: 'Bash', command: 'rm -rf /', agentId } as any)
   expect(bash.deny).toMatch(/read-only/)
   const write = await $.tool.call({ tool: 'Write', file_path: '/x', content: '', agentId } as any)
@@ -27,14 +27,14 @@ test('a reviewer agent cannot write or run commands', async ($, on) => {
 
 test('a reviewer agent can still read', async ($, on) => {
   engine(on)
-  const { agentId } = await $.agent.spawn({ prompt: 'review', subagentType: 'ssdlc:design-reviewer' })
+  const { agentId } = await $.agent.spawn({ prompt: 'review /repo and /work/repo', subagentType: 'ssdlc:design-reviewer' })
   const read = await $.tool.call({ tool: 'Read', file_path: '/repo/a.py', agentId } as any)
   expect(read.deny).toBe(undefined)
 })
 
 test('a reviewer agent can hand its report back', async ($, on) => {
   engine(on)
-  const { agentId } = await $.agent.spawn({ prompt: 'review', subagentType: 'ssdlc:security-reviewer' })
+  const { agentId } = await $.agent.spawn({ prompt: 'review /repo and /work/repo', subagentType: 'ssdlc:security-reviewer' })
   const back = await $.tool.call({ tool: 'SubagentHandback', agentId } as any)
   expect(back.deny).toBe(undefined)
 })
@@ -48,7 +48,7 @@ test('other agents and the main loop are untouched', async ($, on) => {
 
 test('a reviewer agent cannot read credential stores', async ($, on) => {
   engine(on)
-  const { agentId } = await $.agent.spawn({ prompt: 'review', subagentType: 'ssdlc:security-reviewer' })
+  const { agentId } = await $.agent.spawn({ prompt: 'review /repo and /work/repo', subagentType: 'ssdlc:security-reviewer' })
   for (const file_path of ['/root/.ssh/id_rsa', '/home/u/.aws/credentials', '/repo/.env', '/repo/.env.production',
     '/root/.claude/.credentials.json', '/home/u/.netrc', '/repo/certs/server.key', '/proc/self/environ']) {
     const r = await $.tool.call({ tool: 'Read', file_path, agentId } as any)
@@ -60,7 +60,7 @@ test('a reviewer agent cannot read credential stores', async ($, on) => {
 
 test('ordinary source files that merely look similar stay readable', async ($, on) => {
   engine(on)
-  const { agentId } = await $.agent.spawn({ prompt: 'review', subagentType: 'ssdlc:security-reviewer' })
+  const { agentId } = await $.agent.spawn({ prompt: 'review /repo and /work/repo', subagentType: 'ssdlc:security-reviewer' })
   for (const file_path of ['/repo/src/env.ts', '/repo/docs/ssh.md', '/repo/.env.example', '/repo/.env.sample', '/repo/keys.py', '/repo/environment.py']) {
     const r = await $.tool.call({ tool: 'Read', file_path, agentId } as any)
     expect(r.deny).toBe(undefined)
@@ -75,7 +75,7 @@ test('the main loop may still read anything the user allows', async ($, on) => {
 
 test('globs aimed at credential stores are refused, content searches are not', async ($, on) => {
   engine(on)
-  const { agentId } = await $.agent.spawn({ prompt: 'review', subagentType: 'ssdlc:security-reviewer' })
+  const { agentId } = await $.agent.spawn({ prompt: 'review /repo and /work/repo', subagentType: 'ssdlc:security-reviewer' })
   for (const [tool, args] of [
     ['Grep', { pattern: 'KEY', path: '/repo', glob: '.env*' }],
     ['Grep', { pattern: 'x', path: '/repo', glob: '**/*.pem' }],
@@ -95,7 +95,7 @@ test('globs aimed at credential stores are refused, content searches are not', a
 
 test('a symlink in the repo that lands in a credential store is refused', async ($, on) => {
   engine(on, { '/repo/docs/notes.txt': '/root/.ssh/id_ed25519' })
-  const { agentId } = await $.agent.spawn({ prompt: 'review', subagentType: 'ssdlc:security-reviewer' })
+  const { agentId } = await $.agent.spawn({ prompt: 'review /repo and /work/repo', subagentType: 'ssdlc:security-reviewer' })
   const r = await $.tool.call({ tool: 'Read', file_path: '/repo/docs/notes.txt', agentId } as any)
   expect(r.deny).toMatch(/resolves to \/root\/\.ssh\/id_ed25519/)
   const ok = await $.tool.call({ tool: 'Read', file_path: '/repo/src/app.py', agentId } as any)
@@ -104,7 +104,7 @@ test('a symlink in the repo that lands in a credential store is refused', async 
 
 test('review fixes: case, spellings, extra stores, broad searches, cwd', async ($, on) => {
   engine(on, {}, '/root')
-  const { agentId } = await $.agent.spawn({ prompt: 'review', subagentType: 'ssdlc:security-reviewer' })
+  const { agentId } = await $.agent.spawn({ prompt: 'review /repo and /work/repo', subagentType: 'ssdlc:security-reviewer' })
   const denied = async (tool: string, args: object) =>
     (await $.tool.call({ tool, ...args, agentId } as any)).deny
   for (const file_path of ['/Users/u/.SSH/id_rsa', '/repo/.ENV', '/srv/server.KEY', '//proc/self/environ', '/etc//shadow',
@@ -121,7 +121,7 @@ test('review fixes: case, spellings, extra stores, broad searches, cwd', async (
 
 test('review fixes: repo searches still work', async ($, on) => {
   engine(on, {}, '/work/repo')
-  const { agentId } = await $.agent.spawn({ prompt: 'review', subagentType: 'ssdlc:security-reviewer' })
+  const { agentId } = await $.agent.spawn({ prompt: 'review /repo and /work/repo', subagentType: 'ssdlc:security-reviewer' })
   for (const [tool, args] of [['Grep', { pattern: 'eval', path: '/work/repo/src' }], ['Grep', { pattern: 'eval' }],
     ['Glob', { pattern: 'src/**/*.py', path: '/work/repo' }], ['Read', { file_path: '/work/repo/config/settings.py' }]] as const) {
     expect((await $.tool.call({ tool, ...args, agentId } as any)).deny).toBe(undefined)
@@ -130,7 +130,7 @@ test('review fixes: repo searches still work', async ($, on) => {
 
 test('a reviewer is recognised after a module reload, via the agent list', async ($, on) => {
   engine(on)
-  const { agentId } = await $.agent.spawn({ prompt: 'review', subagentType: 'ssdlc:design-reviewer' })
+  const { agentId } = await $.agent.spawn({ prompt: 'review /repo and /work/repo', subagentType: 'ssdlc:design-reviewer' })
   // A tool call from an agent id the module never saw spawn: looked up by type.
   const r = await $.tool.call({ tool: 'Bash', command: 'id', agentId } as any)
   expect(r.deny).toMatch(/read-only/)
@@ -138,10 +138,31 @@ test('a reviewer is recognised after a module reload, via the agent list', async
 
 test('a search without a path is judged by the working directory', async ($, on) => {
   on('ui.toast', () => ({ value: undefined }))
+  on('ui.status', () => ({ value: undefined }))
   on('agent.list', () => ({ value: [{ id: 'r1', type: 'ssdlc:security-reviewer', description: '', status: 'running' }] }))
   // The host resolves "." to the session's working directory; here that is /root.
   on('fs.stat', () => ({ value: { kind: 'dir', size: 0, mtimeMs: 0, isLink: false, realPath: '/root' } }))
   on('tool.call', () => ({ result: {} }))
   const r = await $.tool.call({ tool: 'Grep', pattern: 'token', agentId: 'r1' } as any)
   expect(r.deny).toMatch(/recursively/)
+})
+
+test('allow-list: a reviewer reads only its scope (cwd, plugin, paths named in its prompt)', async ($, on) => {
+  engine(on)
+  const { agentId } = await $.agent.spawn({ prompt: 'Review /work/acme (scope) and the design doc /docs/acme/design.md. Not /.',
+    subagentType: 'ssdlc:security-reviewer' })
+  const call = async (tool: string, args: object) => (await $.tool.call({ tool, ...args, agentId } as any)).deny
+  expect(await call('Read', { file_path: '/work/acme/src/app.py' })).toBe(undefined)
+  expect(await call('Read', { file_path: '/docs/acme/design.md' })).toBe(undefined)
+  expect(await call('Grep', { pattern: 'eval', path: '/work/acme' })).toBe(undefined)
+  expect(await call('Read', { file_path: '/opt/other-project/secrets.py' })).toMatch(/outside this review's scope/)
+  expect(await call('Read', { file_path: '/work/acme-evil/x.py' })).toMatch(/outside this review's scope/) // prefix is not a parent
+  expect(await call('Read', { file_path: '../../etc/hosts' })).toMatch(/outside this review's scope/)
+})
+
+test('allow-list: a broad or credential path in the prompt is not admitted as a root', async ($, on) => {
+  engine(on)
+  const { agentId } = await $.agent.spawn({ prompt: 'Review / and /root and /home/u/.ssh for me.', subagentType: 'ssdlc:security-reviewer' })
+  const r = await $.tool.call({ tool: 'Read', file_path: '/srv/data/x.txt', agentId } as any)
+  expect(r.deny).toMatch(/outside this review's scope/)
 })

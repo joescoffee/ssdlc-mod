@@ -12,7 +12,7 @@ Run a structured security review of a diff, a directory, or a whole repo.
 - Diff: `$GIT diff --no-ext-diff --no-textconv --merge-base origin/HEAD` (or the branch/PR given). Whole repo if nothing is pending, or if git may not be used.
 - Run the mechanical scan first, it is cheap and catches the obvious:
   `python3 -I ${CLAUDE_PLUGIN_ROOT}/scripts/gate_scan.py --json <paths…>` (allow markers are ignored by default). Exit 3 or a non-empty `skipped` list means part of the target was not scanned: say so, the review is `INCOMPLETE` for those files.
-- Then spawn the **`ssdlc:security-reviewer`** agent (read-only) with the target and the scan output. Large targets: split by component, at most 4 reviewers in parallel; tell the user the estimated cost first if more are needed.
+- Then spawn the **`ssdlc:security-reviewer`** agent (read-only) with the target and the scan output. Name every path under review as an **absolute path** in each reviewer's prompt: the guard limits a reviewer to its working directory, this plugin's folder and the paths its prompt names (a filesystem root or home directory is never admitted). Large targets: split by component, at most 4 reviewers in parallel; tell the user the estimated cost first if more are needed.
 - If the `ssdlc:*-reviewer` agent types are not available, **stop and report it** — never fall back to a general-purpose agent, which has shell and write access (OWASP ASI03).
 
 **Review mode.** For a repository you do not trust, ask the user to type `ssdlc review-mode on` first. It
