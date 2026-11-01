@@ -396,7 +396,7 @@ If the hook fails to load because of a Claude Code update, it cannot report the 
 - You can also ask Claude at any time to "call guard_log"; the `guard` block in the reply lists the version, load time and self-test result.
 - Every refusal is written to a local history (across sessions, up to 500 entries); the `history` block of `guard_log` shows the total and the most recent 20.
 
-Results verified on a real Claude app (review mode blocking `curl`, the reviewer allowlist, the `guard_log` liveness check):
+Results verified on a real Claude app (review mode blocking `curl`, the reviewer allowlist, the `guard_log` liveness check). The app's interface was in Chinese, so the labels and the user's messages in this image are translated; the original is `img/step5.png`:
 
 ![Verified on a real Claude app](img/step5.en.png)
 
