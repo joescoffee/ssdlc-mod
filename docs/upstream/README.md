@@ -5,6 +5,7 @@
 | 檔案 | 用途 | 管道 | 狀態 |
 |---|---|---|---|
 | `A-private-vulnerability-report.md` | 5 項 Medium（F1–F5） | 公開 issue（Bug report 模板）或 https://g.co/vulnz 事先通知，擇一 | 待送出 |
+| `A-public-issue.md` | 草稿 A 依上游 **Bug report** 模板重排（預期／實際／重現／環境與證據），附 AI 協助揭露；第一行是標題 | 公開 issue | 待你從瀏覽器送出 |
 | `A-私下漏洞回報-中文版.md` | A 的中文審閱版 | 不送出 | — |
 | `B-public-task-issue.md` | 8 項低風險強化（F6–F13） | 公開 issue（Task 模板） | 可直接送出 |
 | `B-公開Task-issue-中文版.md` | B 的中文審閱版 | 不送出 | — |
