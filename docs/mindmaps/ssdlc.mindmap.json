@@ -4,10 +4,10 @@
     "title": "SSDLC mod",
     "central_image": "🛡️",
     "mode": "bloom",
-    "version": 3,
+    "version": 8,
     "created": "2026-11-01T04:54:12+00:00",
     "id_seq": 0,
-    "updated": "2026-11-01T04:54:16+00:00"
+    "updated": "2026-11-01T05:47:27+00:00"
   },
   "nodes": [
     {
@@ -256,7 +256,7 @@
       "text": "植入缺陷",
       "color": null,
       "order": 0,
-      "note": "8 個全抓"
+      "note": "40 個單元測試：每條規則皆有植入缺陷與安全對照"
     },
     {
       "id": "t2",
@@ -271,7 +271,7 @@
       "text": "hook測試",
       "color": null,
       "order": 2,
-      "note": "3 pass"
+      "note": "9 個 guard hook 測試"
     },
     {
       "id": "i",
@@ -295,6 +295,115 @@
       "color": null,
       "order": 1,
       "note": "/plugin install ssdlc --marketplace joescoffee/ssdlc-mod"
+    },
+    {
+      "id": "s5",
+      "parent": "s",
+      "text": "AI審查",
+      "color": null,
+      "order": 4,
+      "note": "/ssdlc:ai-security-review — LLM01–10:2026、ASI01–10、MIT 因果格、覆蓋矩陣"
+    },
+    {
+      "id": "s5a",
+      "parent": "s5",
+      "text": "盤點",
+      "color": null,
+      "order": 0
+    },
+    {
+      "id": "s5b",
+      "parent": "s5",
+      "text": "二則閘",
+      "color": null,
+      "order": 1,
+      "note": "Rule of Two：不可信輸入 × 機敏資料 × 改變狀態"
+    },
+    {
+      "id": "s5c",
+      "parent": "s5",
+      "text": "覆蓋矩陣",
+      "color": null,
+      "order": 2
+    },
+    {
+      "id": "h4",
+      "parent": "h",
+      "text": "憑證路徑",
+      "color": null,
+      "order": 3,
+      "note": "~/.ssh、~/.aws、.env*、金鑰檔；含 glob（ASI03、LLM02:2026）"
+    },
+    {
+      "id": "h5",
+      "parent": "h",
+      "text": "解析連結",
+      "color": null,
+      "order": 4,
+      "note": "$.fs.stat realPath，擋 repo 內指向憑證的 symlink"
+    },
+    {
+      "id": "g5",
+      "parent": "g",
+      "text": "提示載體",
+      "color": null,
+      "order": 4,
+      "note": "Unicode tag 隱寫（解碼）、零寬／bidi（LLM01:2026）"
+    },
+    {
+      "id": "g6",
+      "parent": "g",
+      "text": "代理權限",
+      "color": null,
+      "order": 5,
+      "note": "bypassPermissions、autoApprove、萬用清單、REPL 工具（LLM03:2026、ASI02/05）"
+    },
+    {
+      "id": "g7",
+      "parent": "g",
+      "text": "MCP設定",
+      "color": null,
+      "order": 6,
+      "note": "未鎖版本、內嵌密鑰、明文傳輸（ASI04/07）"
+    },
+    {
+      "id": "g8",
+      "parent": "g",
+      "text": "嚴格模式",
+      "color": null,
+      "order": 7,
+      "note": "--strict 忽略 allow 標記；suppressed/skipped 皆列報"
+    },
+    {
+      "id": "r",
+      "parent": "root",
+      "text": "參考",
+      "color": "#AD1457",
+      "order": 6
+    },
+    {
+      "id": "r1",
+      "parent": "r",
+      "text": "LLM",
+      "color": null,
+      "order": 0,
+      "note": "OWASP Top 10 for LLM Applications 2026（CC BY-SA 4.0）"
+    },
+    {
+      "id": "r2",
+      "parent": "r",
+      "text": "ASI",
+      "color": null,
+      "order": 1,
+      "note": "OWASP Top 10 for Agentic Applications 2026（CC BY-SA 4.0）"
+    },
+    {
+      "id": "r3",
+      "parent": "r",
+      "text": "MIT分流",
+      "color": null,
+      "order": 2,
+      "note": "AI Risk Repository V4：24 子域 A/B/C、因果情境格（CC BY 4.0）"
     }
   ],
   "links": [
@@ -312,6 +421,16 @@
       "from": "s2a",
       "to": "g1",
       "label": "呼叫"
+    },
+    {
+      "from": "s5",
+      "to": "r1",
+      "label": "依據"
+    },
+    {
+      "from": "g5",
+      "to": "r1",
+      "label": "LLM01"
     }
   ],
   "history": [
@@ -377,6 +496,61 @@
         "i2"
       ],
       "at": "2026-11-01T04:54:16+00:00"
+    },
+    {
+      "v": 4,
+      "action": "apply(16)",
+      "ids": [
+        "s5",
+        "s5a",
+        "s5b",
+        "s5c",
+        "h4",
+        "h5",
+        "g5",
+        "g6",
+        "g7",
+        "g8",
+        "r",
+        "r1",
+        "r2",
+        "r3",
+        "s5->r1",
+        "g5->r1"
+      ],
+      "at": "2026-11-01T05:47:18+00:00"
+    },
+    {
+      "v": 5,
+      "action": "update",
+      "ids": [
+        "t1"
+      ],
+      "at": "2026-11-01T05:47:18+00:00"
+    },
+    {
+      "v": 6,
+      "action": "update",
+      "ids": [
+        "t3"
+      ],
+      "at": "2026-11-01T05:47:18+00:00"
+    },
+    {
+      "v": 7,
+      "action": "update",
+      "ids": [
+        "r1"
+      ],
+      "at": "2026-11-01T05:47:27+00:00"
+    },
+    {
+      "v": 8,
+      "action": "update",
+      "ids": [
+        "r2"
+      ],
+      "at": "2026-11-01T05:47:27+00:00"
     }
   ]
 }
