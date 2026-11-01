@@ -23,6 +23,13 @@ test('a reviewer agent can still read', async ($, on) => {
   expect(read.deny).toBe(undefined)
 })
 
+test('a reviewer agent can hand its report back', async ($, on) => {
+  engine(on)
+  const { agentId } = await $.agent.spawn({ prompt: 'review', subagentType: 'ssdlc:security-reviewer' })
+  const back = await $.tool.call({ tool: 'SubagentHandback', agentId } as any)
+  expect(back.deny).toBe(undefined)
+})
+
 test('other agents and the main loop are untouched', async ($, on) => {
   engine(on)
   const { agentId } = await $.agent.spawn({ prompt: 'x', subagentType: 'general-purpose' })

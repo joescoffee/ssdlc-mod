@@ -4,7 +4,9 @@ import type { Register } from 'claude-code'
 // them to Read/Grep/Glob; this guard refuses anything else should a host or a
 // future edit widen that list. Agent ids are kept per module load: after a
 // reload the frontmatter remains the control for reviewers already running.
-const READ_ONLY = new Set(['Read', 'Grep', 'Glob'])
+// SubagentHandback is how a subagent returns its report to the caller: it
+// writes nothing, and refusing it silently swallows every review.
+const READ_ONLY = new Set(['Read', 'Grep', 'Glob', 'SubagentHandback'])
 const reviewers = new Set<string>()
 
 export const isReviewerType = (type: string | undefined): boolean =>
