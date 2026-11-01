@@ -42,6 +42,12 @@ ssdlc 是一個 **Claude Code 外掛（plugin）**，把安全軟體開發生命
 
 **它不能做的事**：它不是執行期的防火牆或 DLP，也不能保證找出所有漏洞。掃描器是「程式碼衛生檢查」，審查員的結論需要人判斷。詳見[第 12 章](#12-已知限制)。
 
+**全貌一張圖**（v0.5.0）：七條主幹分別是技能、審查員（代理）、守門 hook、掃描器、測試、安裝與參考標準；虛線是彼此的關聯。
+
+![ssdlc 運作方式心智圖（v0.5.0）](../ssdlc-mindmap.png)
+
+（互動版可縮放、展開每個節點的說明：`docs/ssdlc-mindmap.html`）
+
 ---
 
 ## 2. 名詞速查
@@ -451,6 +457,6 @@ claude plugin validate .                   # 外掛結構檢查
 
 **新增規則**：照 `/ssdlc:rule-from-finding` 的步驟。一致性測試會確保規則、範例、測試與檢查清單同步。
 
-**運作方式總覽**：[心智圖](../ssdlc-mindmap.png)（互動版：`../ssdlc-mindmap.html`）。
+**運作方式總覽**：見[第 1 章的心智圖](#1-ssdlc-是什麼)（互動版：`../ssdlc-mindmap.html`）。
 
 **授權**：程式碼為 MIT；`references/ai-risk-checklist.md` 與 `references/mit-ai-risk-triage.md` 改編自 OWASP（CC BY-SA 4.0）與 MIT AI Risk Repository（CC BY 4.0），採 CC BY-SA 4.0，出處見各檔末。
