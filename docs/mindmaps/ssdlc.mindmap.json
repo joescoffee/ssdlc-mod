@@ -4,10 +4,10 @@
     "title": "SSDLC mod",
     "central_image": "🛡️",
     "mode": "bloom",
-    "version": 14,
+    "version": 17,
     "created": "2026-11-01T04:54:12+00:00",
     "id_seq": 0,
-    "updated": "2026-11-01T12:05:33+00:00"
+    "updated": "2026-11-01T14:43:02+00:00"
   },
   "nodes": [
     {
@@ -444,6 +444,32 @@
       "color": null,
       "order": 7,
       "note": "v0.5.0：guard_log 回報版本與規則自我檢查；技能派審查員前先確認，失敗即 INCOMPLETE；跨 session 歷史"
+    },
+    {
+      "id": "i3",
+      "parent": "i",
+      "text": "發布版",
+      "color": null,
+      "order": 2,
+      "note": "GitHub Releases：每版中英雙語發布說明；README 徽章顯示最新版",
+      "source": "github.com/joescoffee/ssdlc-mod/releases"
+    },
+    {
+      "id": "i3a",
+      "parent": "i3",
+      "text": "v0.5.0",
+      "color": null,
+      "order": 0,
+      "note": "最新版（Latest），tag 指向 004c352",
+      "icon": "⭐"
+    },
+    {
+      "id": "i3b",
+      "parent": "i3",
+      "text": "v0.2.1",
+      "color": null,
+      "order": 1,
+      "note": "補發的歷史版本，tag 指向 9a1ff5b"
     }
   ],
   "links": [
@@ -642,6 +668,30 @@
         "s6"
       ],
       "at": "2026-11-01T12:05:33+00:00"
+    },
+    {
+      "v": 15,
+      "action": "add",
+      "ids": [
+        "i3"
+      ],
+      "at": "2026-11-01T14:43:02+00:00"
+    },
+    {
+      "v": 16,
+      "action": "add",
+      "ids": [
+        "i3a"
+      ],
+      "at": "2026-11-01T14:43:02+00:00"
+    },
+    {
+      "v": 17,
+      "action": "add",
+      "ids": [
+        "i3b"
+      ],
+      "at": "2026-11-01T14:43:02+00:00"
     }
   ]
 }

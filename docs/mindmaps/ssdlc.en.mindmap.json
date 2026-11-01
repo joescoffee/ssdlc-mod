@@ -4,10 +4,10 @@
     "title": "SSDLC mod",
     "central_image": "🛡️",
     "mode": "bloom",
-    "version": 2,
+    "version": 5,
     "created": "2026-11-01T12:05:57+00:00",
     "id_seq": 0,
-    "updated": "2026-11-01T12:05:57+00:00"
+    "updated": "2026-11-01T14:43:02+00:00"
   },
   "nodes": [
     {
@@ -444,6 +444,32 @@
       "text": "Coverage matrix",
       "color": null,
       "order": 2
+    },
+    {
+      "id": "i3",
+      "parent": "i",
+      "text": "Releases",
+      "color": null,
+      "order": 2,
+      "note": "GitHub Releases: bilingual release notes for every version; the README badge shows the latest",
+      "source": "github.com/joescoffee/ssdlc-mod/releases"
+    },
+    {
+      "id": "i3a",
+      "parent": "i3",
+      "text": "v0.5.0",
+      "color": null,
+      "order": 0,
+      "note": "Latest release; tag at 004c352",
+      "icon": "⭐"
+    },
+    {
+      "id": "i3b",
+      "parent": "i3",
+      "text": "v0.2.1",
+      "color": null,
+      "order": 1,
+      "note": "Backfilled historical release; tag at 9a1ff5b"
     }
   ],
   "links": [
@@ -549,6 +575,30 @@
         "g5->r1"
       ],
       "at": "2026-11-01T12:05:57+00:00"
+    },
+    {
+      "v": 3,
+      "action": "add",
+      "ids": [
+        "i3"
+      ],
+      "at": "2026-11-01T14:43:02+00:00"
+    },
+    {
+      "v": 4,
+      "action": "add",
+      "ids": [
+        "i3a"
+      ],
+      "at": "2026-11-01T14:43:02+00:00"
+    },
+    {
+      "v": 5,
+      "action": "add",
+      "ids": [
+        "i3b"
+      ],
+      "at": "2026-11-01T14:43:02+00:00"
     }
   ]
 }
