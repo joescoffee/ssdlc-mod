@@ -381,6 +381,12 @@ hook 若因 Claude Code 更新而沒有載入，它無法自己報錯。所以 s
 - 你也可以隨時請 Claude「呼叫 guard_log」，回覆中的 `guard` 區塊會列出版本、載入時間與自我檢查結果。
 - 每次拒絕都會寫進本機的歷史紀錄（跨 session、最多 500 筆），`guard_log` 的 `history` 區塊顯示總數與最近 20 筆。
 
+在 Claude app 中實機驗證的結果（審查模式擋下 `curl`、審查員白名單、`guard_log` 存活檢查）：
+
+![Claude app 實機驗證](img/step5.png)
+
+（第一行是加入 `ssdlc ✓` 前綴之前擷取的原始輸出；v0.5.0 的回覆會以 `ssdlc ✓` 開頭。）
+
 ### 10.4 本機計量
 
 `ssdlc review-mode status` 會顯示自首次使用以來的掃描次數、審查員派出次數、tripwire 與 warn 次數。這些數字只存在你的電腦（Claude Code 的外掛儲存區），不會傳到任何地方，用途是讓你知道工具被使用的程度與警報的頻率。
