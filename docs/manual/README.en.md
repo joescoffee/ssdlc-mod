@@ -124,7 +124,7 @@ When `Add marketplace?` appears, press `y`, then choose the install scope (defau
 claude plugin details ssdlc
 ```
 
-![Install and verify](img/step1.png)
+![Install and verify](img/step1.en.png)
 
 (The screenshot was taken installing with the local repo folder as the marketplace source; when installing from GitHub, the steps and component list on screen are the same.)
 
@@ -310,9 +310,9 @@ python3 -I scripts/gate_scan.py [--json] [--honor-markers] [--files-from <list-f
 | 2 | Argument error (e.g. the mistyped option `--stict`) |
 | 3 | No findings, but the **scan is incomplete** (path missing, unreadable, special file, too large) — not a PASS |
 
-![Scanning AI and agent configuration](img/step2.png)
+![Scanning AI and agent configuration](img/step2.en.png)
 
-![Incomplete scan](img/step3.png)
+![Incomplete scan](img/step3.en.png)
 
 **Using it in CI (GitHub Actions example)**
 
@@ -398,7 +398,7 @@ If the hook fails to load because of a Claude Code update, it cannot report the 
 
 Results verified on a real Claude app (review mode blocking `curl`, the reviewer allowlist, the `guard_log` liveness check):
 
-![Verified on a real Claude app](img/step5.png)
+![Verified on a real Claude app](img/step5.en.png)
 
 (The first line is raw output captured before the `ssdlc ✓` prefix was added; v0.5.0 replies start with `ssdlc ✓`.)
 
@@ -462,7 +462,7 @@ claude plugin test .                       # 28: guard, allow-list, review mode,
 claude plugin validate .                   # plugin structure check
 ```
 
-![Tests](img/step4.png)
+![Tests](img/step4.en.png)
 
 **Adding a rule**: follow the steps of `/ssdlc:rule-from-finding`. The consistency tests make sure rules, examples, tests and checklists stay in sync.
 
