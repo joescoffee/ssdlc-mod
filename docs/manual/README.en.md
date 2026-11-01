@@ -2,7 +2,9 @@
 
 # ssdlc Beginner's Guide
 
-> Applies to: **ssdlc v0.5.0** (2026-11-01). Every command in this guide was actually run on that version; the screenshots are real output.
+[![Release](https://img.shields.io/github/v/release/joescoffee/ssdlc-mod?sort=semver)](https://github.com/joescoffee/ssdlc-mod/releases/latest)
+
+> Applies to: **ssdlc v0.5.0** (2026-11-01, [release notes](https://github.com/joescoffee/ssdlc-mod/releases/tag/v0.5.0)). Every command in this guide was actually run on that version; the screenshots are real output.
 > Read the first three chapters (about 15 minutes) and you can start using it; look up the other chapters when you need them.
 
 ## Contents
@@ -141,6 +143,7 @@ A reply of `ssdlc ✓ Review mode is OFF; guard events this session: 0 …` mean
 | Action | Command |
 |---|---|
 | Update to the latest version | `claude plugin marketplace update ssdlc-mod`, then `claude plugin update ssdlc@ssdlc-mod`; run `/reload-plugins` in the conversation |
+| See what changed in a new version | [Releases page](https://github.com/joescoffee/ssdlc-mod/releases): release notes for every version (English and Chinese); [latest release](https://github.com/joescoffee/ssdlc-mod/releases/latest) |
 | See the installed version | `claude plugin list` (look at `Version:`) |
 | Disable temporarily | `claude plugin disable ssdlc@ssdlc-mod` (to restore: `enable`) |
 | Remove | `claude plugin uninstall ssdlc@ssdlc-mod`, then `claude plugin marketplace remove ssdlc-mod` |

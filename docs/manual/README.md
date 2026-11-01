@@ -2,7 +2,9 @@
 
 # ssdlc 新手操作手冊
 
-> 適用版本：**ssdlc v0.5.0**（2026-11-01）。本手冊的每一條指令都在該版本實際執行過；截圖為實機輸出。
+[![Release](https://img.shields.io/github/v/release/joescoffee/ssdlc-mod?sort=semver)](https://github.com/joescoffee/ssdlc-mod/releases/latest)
+
+> 適用版本：**ssdlc v0.5.0**（2026-11-01，[發布說明](https://github.com/joescoffee/ssdlc-mod/releases/tag/v0.5.0)）。本手冊的每一條指令都在該版本實際執行過；截圖為實機輸出。
 > 讀完前三章（約 15 分鐘）即可開始使用；其餘章節在需要時查閱。
 
 ## 目錄
@@ -141,6 +143,7 @@ ssdlc review-mode status
 | 動作 | 指令 |
 |---|---|
 | 更新到最新版 | `claude plugin marketplace update ssdlc-mod` 然後 `claude plugin update ssdlc@ssdlc-mod`；在對話中執行 `/reload-plugins` |
+| 看新版改了什麼 | [Releases 頁面](https://github.com/joescoffee/ssdlc-mod/releases)：每一版的發布說明（中英雙語）；[最新版本](https://github.com/joescoffee/ssdlc-mod/releases/latest) |
 | 查看已安裝版本 | `claude plugin list`（看 `Version:`） |
 | 暫時停用 | `claude plugin disable ssdlc@ssdlc-mod`（恢復：`enable`） |
 | 移除 | `claude plugin uninstall ssdlc@ssdlc-mod`，再 `claude plugin marketplace remove ssdlc-mod` |
