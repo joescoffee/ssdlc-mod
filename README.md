@@ -4,6 +4,8 @@
 
 Security skills and truly read-only reviewer agents for Claude Code.
 
+在 Claude Code 中落實安全軟體開發生命週期（SSDLC）：安全審查、PR 前閘門、漏洞修復流程，以及 **Elephant-Goldfish Model（EGM）審查的真正唯讀版本**。審查員只有 Read/Grep/Glob，並由 hook 強制執行；不執行被審 repo 的任何程式碼，也不開啟 repo 外的連結。
+
 ## 安裝 / Install
 ```
 /plugin install ssdlc --marketplace joescoffee/ssdlc-mod
@@ -11,6 +13,19 @@ Security skills and truly read-only reviewer agents for Claude Code.
 
 ## 示範 / Demo
 ![ssdlc 實機示範](docs/demo.png)
+
+## 實戰案例：審查 EGM 本身 / Case study
+用 `/ssdlc:safe-bootstrap` 審查上游 [google/elephant-goldfish-model](https://github.com/google/elephant-goldfish-model) @ `403d888`：Elephant（設計威脅建模）與 Goldfish（零背景程式碼審查）平行執行，再合併、交叉驗證。
+
+| 結果 | 內容 |
+|---|---|
+| 判定 | **FIX-BEFORE-MERGE**：無 Critical、無惡意內容；在 Claude Code 上用於可信任 repo 安全 |
+| Medium ×5 | bootstrap 執行 repo 設定的 formatter（可 RCE）、orchestrator 握有 Bash 又讀不受信任內容、非 Claude host 的「只讀」只有文字約束、release job 的未鎖 hash 依賴與 OIDC 權限在同一 job、`Agent` 未限制 spawn 類型 |
+| Low ×7、Info ×1 | 自動讀取連結路徑、synthesizer 寫入路徑未限制、artifact 目錄劫持、marketplace 未鎖版本等 |
+| 推翻前次結論 | Claude Code 的 EGM reviewer **確實**只有 Read/Grep/Glob |
+| 建議 | 不受信任的 repo 不要跑 `/egm-bootstrap`，改用 `/ssdlc:safe-bootstrap` |
+
+完整報告（13 項，含 file:line 證據）：[`docs/reviews/egm-403d888.md`](docs/reviews/egm-403d888.md)
 
 ## 運作方式 / How it works
 ![ssdlc 心智圖](docs/ssdlc-mindmap.png)
