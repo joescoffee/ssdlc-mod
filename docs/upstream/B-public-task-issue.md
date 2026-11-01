@@ -1,6 +1,6 @@
 <!--
 Channel: PUBLIC issue on google/elephant-goldfish-model, template "Task".
-Recommended: file AFTER the private report (draft A) is acknowledged, or after maintainers say these items may be public.
+Can be filed now: the findings are public (joescoffee/ssdlc-mod, public since 2026-11-01). If draft A was filed as a public issue, add "Related: #<its number>" at the end.
 -->
 
 **Title:** Hardening: constrain file paths, write targets, and parallelism; align safety claims in docs

@@ -1,7 +1,7 @@
 <!--
 【中文審閱版，送出時請用英文版 B-public-task-issue.md】
 管道：在 google/elephant-goldfish-model 開公開 issue，使用「Task」模板。
-建議：等私下回報（草稿 A）獲得回覆，或維護者表示這些項目可以公開之後再發。
+可以直接送出：這些發現已經公開（joescoffee/ssdlc-mod 自 2026-11-01 起公開）。若草稿 A 也開成公開 issue，請在文末加上「Related: #<A 的 issue 編號>」。
 -->
 
 **標題：** 強化：限制檔案路徑、寫入目標與平行數；讓文件中的安全宣稱與實際一致

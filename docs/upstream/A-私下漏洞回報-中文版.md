@@ -1,8 +1,9 @@
 <!--
 【中文審閱版，送出時請用英文版 A-private-vulnerability-report.md】
-管道：私下回報。請經由 https://g.co/vulnz（Google Bug Hunters／OSS VRP）送出；
-若 google/elephant-goldfish-model 的 Security 分頁有「Report a vulnerability」，也可用它。
-請勿開成公開 issue。
+管道：這些發現已經公開（joescoffee/ssdlc-mod 自 2026-11-01 起公開），兩種方式擇一即可：
+  - 在 google/elephant-goldfish-model 開公開 issue，使用「Bug report」模板（從 **Product** 那行開始貼）；或
+  - 經 https://g.co/vulnz（Google Bug Hunters／OSS VRP）事先通知，交由 Google 安全團隊分流處理。
+無論哪種，都保留「先前曝光」一節：它告訴維護者這些細節已經公開。
 -->
 
 **標題：** egm-bootstrap 可能執行被審查 repo 中由攻擊者控制的程式碼；數條路徑上的「唯讀」保證只靠提示文字；簽署 release 的 job 安裝未鎖 hash 的依賴
