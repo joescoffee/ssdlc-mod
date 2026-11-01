@@ -32,6 +32,8 @@ claude plugin install ssdlc --marketplace joescoffee/ssdlc-mod
 
 完整報告（13 項，含 file:line 證據）：[`docs/reviews/egm-403d888.md`](docs/reviews/egm-403d888.md)
 
+已回報上游：[google/elephant-goldfish-model#261](https://github.com/google/elephant-goldfish-model/issues/261)（F1–F5）、[#262](https://github.com/google/elephant-goldfish-model/issues/262)（F6–F13）。
+
 ## 運作方式 / How it works
 ![ssdlc 心智圖](docs/ssdlc-mindmap.png)
 
