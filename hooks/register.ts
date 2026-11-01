@@ -51,15 +51,25 @@ export const register: Register = on => {
     return started
   })
 
-  on('tool.call', ($, e, next) => {
+  on('tool.call', async ($, e, next) => {
     if (e.agentId === undefined || !reviewers.has(e.agentId)) return next(e)
-    if (!READ_ONLY.has(e.tool)) {
-      return { deny: `${$.plugin.name}: reviewer agents are read-only (${e.tool} refused).` }
+    const refuse = (why: string) => {
+      // Denials are surfaced, not silent (ASI08/ASI10: a reviewer probing for
+      // credentials is itself a sign of prompt injection in the target).
+      $.ui.toast(`${$.plugin.name}: blocked reviewer ${e.tool} — ${why}`)
+      return { deny: `${$.plugin.name}: ${why}` }
     }
-    const hit = sensitiveTarget(e.tool, e as unknown as Record<string, unknown>)
-    if (hit !== undefined) {
-      return {
-        deny: `${$.plugin.name}: reviewers may not read credential stores (${hit}). Report the reference as a finding instead.`,
+    if (!READ_ONLY.has(e.tool)) return refuse(`reviewer agents are read-only (${e.tool} refused).`)
+    const args = e as unknown as Record<string, unknown>
+    const spelled = sensitiveTarget(e.tool, args)
+    if (spelled !== undefined) {
+      return refuse(`reviewers may not read credential stores (${spelled}). Report the reference as a finding instead.`)
+    }
+    // A symlink inside the repository can point at ~/.ssh: judge where it lands.
+    for (const p of touchedPaths(e.tool, args).paths) {
+      const real = (await $.fs.stat(p, { resolve: true }).catch(() => undefined))?.realPath
+      if (real !== undefined && real !== p && SENSITIVE_PATH.test(real)) {
+        return refuse(`reviewers may not read credential stores (${p} resolves to ${real}). Report the link as a finding instead.`)
       }
     }
     return next(e)

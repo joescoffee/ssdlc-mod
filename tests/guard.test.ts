@@ -1,8 +1,10 @@
 import { expect, test } from 'claude-code/testing'
 
 // Stand-ins for the engine beneath the plugin.
-const engine = (on: any) => {
+const engine = (on: any, links: Record<string, string> = {}) => {
   let n = 0
+  on('ui.toast', () => ({ value: undefined }))
+  on('fs.stat', (_: any, e: any) => ({ value: { kind: 'file', size: 1, mtimeMs: 0, isLink: e.path in links, realPath: links[e.path] ?? e.path } }))
   on('agent.spawn', () => ({ agentId: `agent-${++n}`, model: 'm' }))
   on('tool.call', () => ({ result: {} }))
 }
@@ -82,4 +84,13 @@ test('globs aimed at credential stores are refused, content searches are not', a
   ] as const) {
     expect((await $.tool.call({ tool, ...args, agentId } as any)).deny).toBe(undefined)
   }
+})
+
+test('a symlink in the repo that lands in a credential store is refused', async ($, on) => {
+  engine(on, { '/repo/docs/notes.txt': '/root/.ssh/id_ed25519' })
+  const { agentId } = await $.agent.spawn({ prompt: 'review', subagentType: 'ssdlc:security-reviewer' })
+  const r = await $.tool.call({ tool: 'Read', file_path: '/repo/docs/notes.txt', agentId } as any)
+  expect(r.deny).toMatch(/resolves to \/root\/\.ssh\/id_ed25519/)
+  const ok = await $.tool.call({ tool: 'Read', file_path: '/repo/src/app.py', agentId } as any)
+  expect(ok.deny).toBe(undefined)
 })

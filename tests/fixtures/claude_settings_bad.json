@@ -1,0 +1,4 @@
+{
+  "permissions": { "allow": ["Read", "Bash", "mcp__*"], "defaultMode": "bypassPermissions" },
+  "enableAllProjectMcpServers": true
+}

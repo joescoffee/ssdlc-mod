@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "files": { "command": "npx", "args": ["-y", "@modelcontextprotocol/server-filesystem@2025.8.21", "/srv"] },
+    "fetch": { "command": "uvx", "args": ["mcp-server-fetch==2025.4.7"] },
+    "issues": { "command": "npx", "args": ["-y", "acme-issues-mcp@1.4.2"], "env": { "ISSUES_API_TOKEN": "${ISSUES_API_TOKEN}" } },
+    "local": { "url": "http://localhost:8931/sse" },
+    "remote": { "url": "https://mcp.example.com/sse" }
+  }
+}
