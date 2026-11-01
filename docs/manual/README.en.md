@@ -50,7 +50,7 @@ How it differs from an ordinary linter:
 
 ![Mind map of how ssdlc works (v0.5.0)](../ssdlc-mindmap.en.png)
 
-**The interactive version** (open `docs/ssdlc-mindmap.en.html` in a browser; the toolbar and hint text are Chinese) lets you drag to pan, zoom with the scroll wheel or toolbar, click to select a node, double-click or press F2 to edit text, drag a node to move a branch, and press Tab to add a child node. When you are done, click "匯出 JSON（貼回給 Claude）" ("Export JSON (paste back to Claude)") and paste the result back into the conversation to sync it to the mind map's state file. The image below shows the view zoomed to 120% with the "Liveness check" node selected:
+**The interactive version** (open `docs/ssdlc-mindmap.en.html` in a browser; the toolbar and hint text are Chinese) lets you drag to pan, zoom with the scroll wheel or toolbar, click to select a node, double-click or press F2 to edit text, drag a node to move a branch, and press Tab to add a child node. When you are done, click "匯出 JSON（貼回給 Claude）" ("Export JSON (paste back to Claude)") and paste the result back into the conversation to sync it to the mind map's state file. The image below shows the view zoomed to 120% with the "Install → Releases → v0.5.0" node selected:
 
 ![Interactive mind map: zoomed in with a node selected](img/mindmap-interactive.en.png)
 
